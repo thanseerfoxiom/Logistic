@@ -39386,3 +39386,47 @@ body:after {
   .action_fonts{
     font-size:20px
   }
+
+
+
+  
+.job-details__availability .title {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center
+}
+
+.job-details__availability .title:not(:last-child) {
+    margin-bottom: 7px
+}
+
+.job-details__availability .title p {
+    font-size: 14px;
+    line-height: 1.4285714286;
+    font-weight: 500;
+    color: var(--color-dark);
+    margin-bottom: 0;
+    text-transform: capitalize;
+    -ms-flex-preferred-size: 65px;
+    flex-basis: 150px;
+    margin-bottom: 0
+}
+
+.job-details__availability .title span {
+    margin-left: 30px;
+    font-size: 14px;
+    line-height: 1.4285714286;
+    font-weight: 500
+}
+
+.job-details__availability .title span.stock {
+    color: var(--color-success)
+}
+
+.job-details__availability .title span.free {
+    font-weight: 400;
+    color: var(--color-light)
+}

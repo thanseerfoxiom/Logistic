@@ -6,12 +6,14 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
 import { Col ,Row} from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
+import { detailsPath } from '../../../services/UrlPaths';
 
 export default function Finance() {
     const [pageLoading, setpageLoading] = useState(true);
   const { mobileSide } = useContext(ContextDatas);
   const [show, setShow] = useState(false);
-
+  const navigate = useNavigate()
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
@@ -140,7 +142,7 @@ export default function Finance() {
                               <tr>
                                
                                 <td className='text-ellipsis'> 1323</td>
-                                <td className='text-ellipsis'> a tobcompany shfbs sdufbsd fuisdif u</td>
+                                <td className='text-ellipsis cursor-true' onClick={() =>navigate(`/${detailsPath}`)} > a tobcompany shfbs sdufbsd fuisdif u</td>
                                 <td className='text-ellipsis'>completed</td>
                                 <td className='text-ellipsis'>154 aed</td>
                                 <td className='text-ellipsis'>Not paid</td>
@@ -151,14 +153,27 @@ export default function Finance() {
 
                                 <td>
                                
-                                  <ul className='text-align-center d-flex'>
+                                  {/* <ul className='text-align-center d-flex'>
                                     <li>
                                       <a href="#" class="view" onClick={handleShow}>
                                         <i class="uil uil-eye action_fonts"></i>
                                       </a>
                                     </li>
                                    
-                                  </ul>
+                                  </ul> */}
+                                    <ul class="text-align-center d-flex">
+                                       
+                                       <li>
+                                         <a href="#" class="edit" onClick={handleShow}>
+                                           <i class="uil uil-edit action_fonts"></i>
+                                         </a>
+                                       </li>
+                                       <li>
+                                         <a href="#" class="remove">
+                                           <i class="uil uil-trash-alt action_fonts"></i>
+                                         </a>
+                                       </li>
+                                     </ul>
                                 </td>
                               </tr>
                               {/* <tr>
@@ -187,7 +202,7 @@ export default function Finance() {
         </div>
         <Modal show={show} onHide={handleClose} size="xl">
         <Modal.Header closeButton>
-          <Modal.Title>Job Details</Modal.Title>
+          <Modal.Title>Finance Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
       <Form>
@@ -199,39 +214,8 @@ export default function Finance() {
               <Form.Control type="text" placeholder="a tobcompany shf..." />
             </Form.Group>
           </Col>
-        
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formContact">
-              <Form.Label>Contact</Form.Label>
-              <Form.Control type="text" placeholder="+091 12 545 6546 " />
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="text" placeholder="email@gmail.com " />
-            </Form.Group>
-          </Col>
        
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formFrom">
-              <Form.Label>From</Form.Label>
-              <Form.Control type="text" placeholder="place" />
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formTo">
-              <Form.Label>To</Form.Label>
-              <Form.Control type="text" placeholder="to place" />
-            </Form.Group>
-          </Col>
-       
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formDistance">
-              <Form.Label>Distance</Form.Label>
-              <Form.Control type="text" placeholder="110 km" />
-            </Form.Group>
-          </Col>
+         
           <Col md={6}>
             <Form.Group className="mb-3" controlId="formQuotePrice">
               <Form.Label>Quote Price</Form.Label>
@@ -272,23 +256,7 @@ export default function Finance() {
               </div>
             </Form.Group>
           </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="productDetails">
-              <Form.Label>Product Details</Form.Label>
-              <div>
-                <img
-                  className="mt-1"
-                  src="/public/img/pdfimg.png"
-                  alt="PDF Icon"
-                  style={{
-                    width: "110px",
-                    height: "110px",
-                    cursor: "pointer"
-                  }}
-                />
-              </div>
-            </Form.Group>
-          </Col>
+         
           <Col md={6}>
             <Form.Group className="mb-3" controlId="productDetails">
               <Form.Label>delivery document</Form.Label>
@@ -308,20 +276,7 @@ export default function Finance() {
           </Col>
         
        
-          <Col md={6}>
-            <Form.Group className="mb-3" controlId="formDriverDetails">
-              <Form.Label>Driver</Form.Label>
-              <div className="select-wrapper">
-                <Form.Control as="select">
-                  <option value="">Select Driver</option>
-                  <option value="request-pending">Driver 1</option>
-                  <option value="driver-arrived">Driver 2</option>
-                  <option value="picked-up">Driver 3</option>
-                  <option value="delivered">Driver 4</option>
-                </Form.Control>
-              </div>
-            </Form.Group>
-          </Col>
+          
           <Col md={6}>
             <Form.Group className="mb-3" controlId="formDate">
               <Form.Label>Date</Form.Label>

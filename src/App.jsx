@@ -8,6 +8,8 @@ import PageNotFound from "./pages/public/PageNotFound";
 import {
   basePath,
 
+  detailsPath,
+
   driversPath,
 
   financePath,
@@ -24,6 +26,7 @@ import Job from "./pages/private/jobs/Job";
 import Finance from "./pages/private/finance/Finance";
 import Drivers from "./pages/private/drivers/Drivers";
 import Trucks from "./pages/private/Trucks/Trucks";
+import Details from "./pages/private/finance/Details";
 
 
 function App() {
@@ -59,6 +62,10 @@ function App() {
           <Route
             path={basePath + truckPath }
             element={<Trucks/>}
+          />
+          <Route
+            path={basePath + detailsPath }
+            element={<Details/>}
           />
         </Route>
         <Route path="*" element={<PageNotFound />} />

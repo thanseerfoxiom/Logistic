@@ -130,18 +130,16 @@ function Sidebar() {
               </Link>
             </li>
 
-            <li className={urlPath.includes("settings") ? "active" : ""}>
+            {/* <li className={urlPath.includes("settings") ? "active" : ""}>
               <Link
                 to={basePath + settingsPath}
                 onClick={() => setUrlPath(basePath + settingsPath)}
               >
                 <i className="nav-icon fas fa-cog" />
                 <span className="menu-text">Settings</span>
-                {/* <span className="badge badge-info-10 menuItem rounded-pill">
-              1.1.7
-            </span> */}
+              
               </Link>
-            </li>
+            </li> */}
 
 
             {/* <li className="menu-title mt-30">

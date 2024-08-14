@@ -138,7 +138,7 @@ export default function Trucks() {
                                     <div>
                                     <img
                                         className="mt-1"
-                                        src="/public/img/noimg.png"
+                                        src="/img/noimg.png"
                                         alt="PDF Icon"
                                         style={{
                                         width: "80px",
@@ -231,7 +231,7 @@ export default function Trucks() {
             <Col md={6}>
             <img
                   className="mt-1"
-                  src="/public/img/noimg.png"
+                  src="/img/noimg.png"
                   alt="PDF Icon"
                   style={{
                     width: "110px",
