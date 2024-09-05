@@ -5,7 +5,8 @@ import Pagination from '../../../components/Pagination';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import { useReactTable, getCoreRowModel, flexRender } from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel, flexRender, getPaginationRowModel } from '@tanstack/react-table';
+import Table from '../../../components/Table';
 
 export default function Quotation() {
   const [pageLoading, setpageLoading] = useState(true);
@@ -14,7 +15,11 @@ export default function Quotation() {
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
+  const [selectData,setselectData] =useState('')
+  const [pagination,setPagination] =useState({
+    pageIndex:0,
+    pageSize:1
+  })
   useEffect(() => {
     const timer = setTimeout(() => {
       setpageLoading(false);
@@ -84,7 +89,88 @@ export default function Quotation() {
       vehicleType: '12 axil',
       quotePrice: '2200 AED',
       date: '18 Mar 2024'
-    }
+    },
+    {
+      jobId: '1323',
+      name: 'a tobcompany shfbs sdufbsd fuisdif u',
+      from: 'place',
+      to: 'to place',
+      distance: '110 km',
+      vehicleType: '4 axil',
+      quotePrice: '1100 AED',
+      date: '13 Mar 2024'
+    },
+    {
+      jobId: '1324',
+      name: 'company 2',
+      from: 'location A',
+      to: 'location B',
+      distance: '150 km',
+      vehicleType: '2 axil',
+      quotePrice: '1200 AED',
+      date: '14 Mar 2024'
+    },
+    {
+      jobId: '1325',
+      name: 'company 3',
+      from: 'city A',
+      to: 'city B',
+      distance: '200 km',
+      vehicleType: '6 axil',
+      quotePrice: '1500 AED',
+      date: '15 Mar 2024'
+    },
+    {
+      jobId: '1326',
+      name: 'company 4',
+      from: 'town A',
+      to: 'town B',
+      distance: '300 km',
+      vehicleType: '8 axil',
+      quotePrice: '1800 AED',
+      date: '16 Mar 2024'
+    },
+    {
+      jobId: '1327',
+      name: 'company 5',
+      from: 'village A',
+      to: 'village B',
+      distance: '400 km',
+      vehicleType: '10 axil',
+      quotePrice: '2000 AED',
+      date: '17 Mar 2024'
+    },
+    {
+      jobId: '1328',
+      name: 'company 6',
+      from: 'district A',
+      to: 'district B',
+      distance: '500 km',
+      vehicleType: '12 axil',
+      quotePrice: '2200 AED',
+      date: '18 Mar 2024'
+    },
+    
+    {
+      jobId: '1327',
+      name: 'company 5',
+      from: 'village A',
+      to: 'village B',
+      distance: '400 km',
+      vehicleType: '10 axil',
+      quotePrice: '2000 AED',
+      date: '17 Mar 2024'
+    },
+    {
+      jobId: '1328',
+      name: 'company 6',
+      from: 'district A',
+      to: 'district B',
+      distance: '500 km',
+      vehicleType: '12 axil',
+      quotePrice: '2200 AED',
+      date: '18 Mar 2024'
+    },
   ], []);
 
   // Column definitions
@@ -96,6 +182,7 @@ export default function Quotation() {
     {
       header: 'Name',
       accessorKey: 'name',
+      cell:info=><strong >{info.getValue()}</strong>
     },
     {
       header: 'From',
@@ -121,15 +208,37 @@ export default function Quotation() {
       header: 'Date',
       accessorKey: 'date',
     },
+    {
+      header: 'Action',
+      // accessorKey: '',
+    //   cell:info=><ul className='text-align-center d-flex'>
+    //   <li>
+    //     <a href="#" class="view" onClick={handleShow && console.log("infoooooooo",info.cell.row.original)}>
+    //       <i class="uil uil-eye action_fonts"></i>
+    //     </a>
+    //   </li>
+     
+    // </ul>
+    cell: ({ row }) => (
+      <ul className='text-align-center d-flex'>
+        <li>
+          <a
+            href="#"
+            className="view"
+            onClick={() => {
+              handleShow(); 
+              setselectData(row.original);
+            }}
+          >
+            <i className="uil uil-eye action_fonts"></i>
+          </a>
+        </li>
+      </ul>
+    )
+    },
   ], []);
 
-  // Initialize the table
-  const table = useReactTable({
-    data: quotdatalist,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
+ 
   return (
     <>
       {pageLoading ? (
@@ -139,7 +248,7 @@ export default function Quotation() {
           <div className="demo2 mb-25 t-thead-bg">
             <div className="container-fluid">
               <div className="row mt-50">
-                <div className="col-xxl-8 mb-25">
+                <div className="col-xxl-12 mb-25">
                   <div className="card border-0 px-25">
                     <div className="card-header px-0 border-0">
                       <h6>Quotation</h6>
@@ -193,33 +302,8 @@ export default function Quotation() {
                           role="tabpanel"
                           aria-labelledby="t_selling-today222-tab"
                         >
-                          <div className="userDatatable mt-1 p-2 table-responsive">
-                            <table className="table table--default body-px-25">
-                              <thead>
-                                {table.getHeaderGroups().map(headerGroup => (
-                                  <tr key={headerGroup.id}>
-                                    {headerGroup.headers.map(header => (
-                                      <th key={header.id}>
-                                        {flexRender(header.column.columnDef.header, header.getContext())}
-                                      </th>
-                                    ))}
-                                  </tr>
-                                ))}
-                              </thead>
-                              <tbody>
-                                {table.getRowModel().rows.map(row => (
-                                  <tr key={row.id}>
-                                    {row.getVisibleCells().map(cell => (
-                                      <td key={cell.id}>
-                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                      </td>
-                                    ))}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                          <Pagination />
+                          <Table data={quotdatalist} columns={columns} pagination={pagination} setPagination={setPagination}/>
+                          
                         </div>
                       </div>
                     </div>
