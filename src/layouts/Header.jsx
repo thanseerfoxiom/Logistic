@@ -14,7 +14,7 @@ function Header() {
               {/* <span>Clarita</span> */}
             </a>
             <a
-              href="#"
+              // href="#"
               className="sidebar-toggle"
               onClick={(e) => {
                 e.preventDefault();

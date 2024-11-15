@@ -48,6 +48,9 @@
 import React from "react";
 
 function Pagination({ table }) {
+  if (!table) {
+    return null; // Or display a message like "Loading..."
+  }
   return (
     <nav className="dm-page mb-2 px-2 pb-2" style={{ float: "right" }}>
       <ul className="dm-pagination d-flex">
