@@ -1329,6 +1329,10 @@ h6 {
     border: 1px solid var(--color-gray)
 }
 
+.border-lightborder {
+    border: 1px solid #d7d8d8
+}
+
 .bg-opacity-gray-20 {
     background: rgba(var(--color-gray-rgba), .2)
 }
@@ -3318,7 +3322,12 @@ a {
     -o-transition: var(--transition);
     transition: var(--transition)
 }
-
+.btndefault {
+    background-color: "#2685c7" !important; 
+}
+.btndefault:hover{
+    background-color: "#20366c" !important; 
+}
 button:active,
 button:focus,
 select:active,

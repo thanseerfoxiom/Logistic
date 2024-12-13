@@ -1,200 +1,249 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ContextDatas } from '../../../services/Context';
 import Loader from '../../../components/Loader';
-import Pagination from '../../../components/Pagination';
+// import Pagination from '../../../components/Pagination';
 // import Button from 'react-bootstrap/Button';
 // import Form from 'react-bootstrap/Form';
 import Modal from 'react-bootstrap/Modal';
-import { useReactTable, getCoreRowModel, flexRender, getPaginationRowModel } from '@tanstack/react-table';
+// import { useReactTable, getCoreRowModel, flexRender, getPaginationRowModel } from '@tanstack/react-table';
+import {useFetchData} from '../../../services/useQueryFetchData.js'
 import Table from '../../../components/Table';
 import FormikField from '../../../components/InputComponents.jsx';
 import { Formik } from 'formik';
 import { Form, Button, Row } from 'react-bootstrap';
+import { fetchQuatation } from '../../../api/index.js';
+import { useCustomMutation } from '../../../services/useCustomMutation.js';
+import Commonmodal from '../../../components/modal/Commonmodal.jsx';
+import SingleSelect from '../../../components/ui/SingleSelect.jsx';
+import places from '../../../json/places.json'
+import { calculateDistance } from '../../../utils/calculateDistance.js';
 export default function Quotation() {
   const [pageLoading, setpageLoading] = useState(true);
   const { mobileSide } = useContext(ContextDatas);
   const [show, setShow] = useState(false);
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [selectData,setselectData] =useState('')
   const [pagination,setPagination] =useState({
     pageIndex:0,
-    pageSize:1
+    pageSize:10
   })
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setpageLoading(false);
-    }, 1000); 
+  const {mutation} = useCustomMutation();
+  const { data: quotdatalist} = useFetchData('quotation',fetchQuatation);
+  console.log("padataa",quotdatalist?.data?.docs)
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setpageLoading(false);
+  //   }, 1000); 
 
-    return () => clearTimeout(timer);
-  }, []);
-  
+  //   return () => clearTimeout(timer);
+  // }, []);
+  // console.log("places",places)
+  const optionPlaces = places?.map(item=>({
+    value:item.city,
+    label:item.city,
+    lat:item.latitude,
+    lon:item.longitude
+  }))
+  const handleDelete=()=>{
+    try {
+      mutation.mutate({
+        method: "delete",
+        url: `${productsapi}/${deleteId}`,
+        key:'product',
+       
+      });
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const handleSubmit = (values, actions) => {
+    console.log("values",values)
+    return 
+    const apiurl = values?.id? `${productsapi}/${values.id}` : productsapi;
+    mutation.mutate({
+        method: values?.id? "put":"post",
+        url: apiurl,
+        values: { ...values },
+        key: "product",
+        next: () => {
+          handleClose(); 
+          actions.resetForm()
+          setdata(null)
+        },
+    },       { onError: (error) => {
+      actions.setSubmitting(false); 
+    },}
+  );
+  };
 
   const [productImagePreview, setProductImagePreview] = useState(null);
 
-  const handleImageUpload = (event, setFieldValue) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProductImagePreview(reader.result);
-        setFieldValue('productDetails', file);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  
   // Data for the table
-  const quotdatalist = useMemo(() => [
-    {
-      jobId: '1323',
-      name: 'a tobcompany shfbs sdufbsd fuisdif u',
-      from: 'place',
-      to: 'to place',
-      distance: '110 km',
-      vehicleType: '4 axil',
-      quotePrice: '1100 AED',
-      date: '13 Mar 2024'
-    },
-    {
-      jobId: '1324',
-      name: 'company 2',
-      from: 'location A',
-      to: 'location B',
-      distance: '150 km',
-      vehicleType: '2 axil',
-      quotePrice: '1200 AED',
-      date: '14 Mar 2024'
-    },
-    {
-      jobId: '1325',
-      name: 'company 3',
-      from: 'city A',
-      to: 'city B',
-      distance: '200 km',
-      vehicleType: '6 axil',
-      quotePrice: '1500 AED',
-      date: '15 Mar 2024'
-    },
-    {
-      jobId: '1326',
-      name: 'company 4',
-      from: 'town A',
-      to: 'town B',
-      distance: '300 km',
-      vehicleType: '8 axil',
-      quotePrice: '1800 AED',
-      date: '16 Mar 2024'
-    },
-    {
-      jobId: '1327',
-      name: 'company 5',
-      from: 'village A',
-      to: 'village B',
-      distance: '400 km',
-      vehicleType: '10 axil',
-      quotePrice: '2000 AED',
-      date: '17 Mar 2024'
-    },
-    {
-      jobId: '1328',
-      name: 'company 6',
-      from: 'district A',
-      to: 'district B',
-      distance: '500 km',
-      vehicleType: '12 axil',
-      quotePrice: '2200 AED',
-      date: '18 Mar 2024'
-    },
-    {
-      jobId: '1323',
-      name: 'a tobcompany shfbs sdufbsd fuisdif u',
-      from: 'place',
-      to: 'to place',
-      distance: '110 km',
-      vehicleType: '4 axil',
-      quotePrice: '1100 AED',
-      date: '13 Mar 2024'
-    },
-    {
-      jobId: '1324',
-      name: 'company 2',
-      from: 'location A',
-      to: 'location B',
-      distance: '150 km',
-      vehicleType: '2 axil',
-      quotePrice: '1200 AED',
-      date: '14 Mar 2024'
-    },
-    {
-      jobId: '1325',
-      name: 'company 3',
-      from: 'city A',
-      to: 'city B',
-      distance: '200 km',
-      vehicleType: '6 axil',
-      quotePrice: '1500 AED',
-      date: '15 Mar 2024'
-    },
-    {
-      jobId: '1326',
-      name: 'company 4',
-      from: 'town A',
-      to: 'town B',
-      distance: '300 km',
-      vehicleType: '8 axil',
-      quotePrice: '1800 AED',
-      date: '16 Mar 2024'
-    },
-    {
-      jobId: '1327',
-      name: 'company 5',
-      from: 'village A',
-      to: 'village B',
-      distance: '400 km',
-      vehicleType: '10 axil',
-      quotePrice: '2000 AED',
-      date: '17 Mar 2024'
-    },
-    {
-      jobId: '1328',
-      name: 'company 6',
-      from: 'district A',
-      to: 'district B',
-      distance: '500 km',
-      vehicleType: '12 axil',
-      quotePrice: '2200 AED',
-      date: '18 Mar 2024'
-    },
+  // const quotdatalist = useMemo(() => [
+  //   {
+  //     jobId: '1323',
+  //     name: 'a tobcompany shfbs sdufbsd fuisdif u',
+  //     from: 'place',
+  //     to: 'to place',
+  //     distance: '110 km',
+  //     vehicleType: '4 axil',
+  //     quotePrice: '1100 AED',
+  //     date: '13 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1324',
+  //     name: 'company 2',
+  //     from: 'location A',
+  //     to: 'location B',
+  //     distance: '150 km',
+  //     vehicleType: '2 axil',
+  //     quotePrice: '1200 AED',
+  //     date: '14 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1325',
+  //     name: 'company 3',
+  //     from: 'city A',
+  //     to: 'city B',
+  //     distance: '200 km',
+  //     vehicleType: '6 axil',
+  //     quotePrice: '1500 AED',
+  //     date: '15 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1326',
+  //     name: 'company 4',
+  //     from: 'town A',
+  //     to: 'town B',
+  //     distance: '300 km',
+  //     vehicleType: '8 axil',
+  //     quotePrice: '1800 AED',
+  //     date: '16 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1327',
+  //     name: 'company 5',
+  //     from: 'village A',
+  //     to: 'village B',
+  //     distance: '400 km',
+  //     vehicleType: '10 axil',
+  //     quotePrice: '2000 AED',
+  //     date: '17 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1328',
+  //     name: 'company 6',
+  //     from: 'district A',
+  //     to: 'district B',
+  //     distance: '500 km',
+  //     vehicleType: '12 axil',
+  //     quotePrice: '2200 AED',
+  //     date: '18 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1323',
+  //     name: 'a tobcompany shfbs sdufbsd fuisdif u',
+  //     from: 'place',
+  //     to: 'to place',
+  //     distance: '110 km',
+  //     vehicleType: '4 axil',
+  //     quotePrice: '1100 AED',
+  //     date: '13 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1324',
+  //     name: 'company 2',
+  //     from: 'location A',
+  //     to: 'location B',
+  //     distance: '150 km',
+  //     vehicleType: '2 axil',
+  //     quotePrice: '1200 AED',
+  //     date: '14 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1325',
+  //     name: 'company 3',
+  //     from: 'city A',
+  //     to: 'city B',
+  //     distance: '200 km',
+  //     vehicleType: '6 axil',
+  //     quotePrice: '1500 AED',
+  //     date: '15 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1326',
+  //     name: 'company 4',
+  //     from: 'town A',
+  //     to: 'town B',
+  //     distance: '300 km',
+  //     vehicleType: '8 axil',
+  //     quotePrice: '1800 AED',
+  //     date: '16 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1327',
+  //     name: 'company 5',
+  //     from: 'village A',
+  //     to: 'village B',
+  //     distance: '400 km',
+  //     vehicleType: '10 axil',
+  //     quotePrice: '2000 AED',
+  //     date: '17 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1328',
+  //     name: 'company 6',
+  //     from: 'district A',
+  //     to: 'district B',
+  //     distance: '500 km',
+  //     vehicleType: '12 axil',
+  //     quotePrice: '2200 AED',
+  //     date: '18 Mar 2024'
+  //   },
     
-    {
-      jobId: '1327',
-      name: 'company 5',
-      from: 'village A',
-      to: 'village B',
-      distance: '400 km',
-      vehicleType: '10 axil',
-      quotePrice: '2000 AED',
-      date: '17 Mar 2024'
-    },
-    {
-      jobId: '1328',
-      name: 'company 6',
-      from: 'district A',
-      to: 'district B',
-      distance: '500 km',
-      vehicleType: '12 axil',
-      quotePrice: '2200 AED',
-      date: '18 Mar 2024'
-    },
-  ], []);
+  //   {
+  //     jobId: '1327',
+  //     name: 'company 5',
+  //     from: 'village A',
+  //     to: 'village B',
+  //     distance: '400 km',
+  //     vehicleType: '10 axil',
+  //     quotePrice: '2000 AED',
+  //     date: '17 Mar 2024'
+  //   },
+  //   {
+  //     jobId: '1328',
+  //     name: 'company 6',
+  //     from: 'district A',
+  //     to: 'district B',
+  //     distance: '500 km',
+  //     vehicleType: '12 axil',
+  //     quotePrice: '2200 AED',
+  //     date: '18 Mar 2024'
+  //   },
+  // ], []);
 
   // Column definitions
+  const calculatedistance = (fromlat,fromlon,tolat,tolon)=>{
+    try {
+      console.log("fromlat",`${fromlat},${fromlon}`)
+      console.log("toooooo",`${tolat},${tolon}`)
+      if(fromlat && tolat){
+        const data = calculateDistance(fromlat,fromlon,tolat,tolon)
+        return data.toFixed(2)
+      }else{
+        return ""
+      }
+    } catch (error) {     
+    }
+  }
   const columns = useMemo(() => [
-    {
-      header: 'Job ID',
-      accessorKey: 'jobId',
-    },
+    // {
+    //   header: 'Job ID',
+    //   accessorKey: 'jobId',
+    // },
     {
       header: 'Name',
       accessorKey: 'name',
@@ -253,13 +302,11 @@ export default function Quotation() {
     )
     },
   ], []);
-
+  
  
   return (
     <>
-      {pageLoading ? (
-        <Loader />
-      ) : (
+       (
         <div className={`contents ${mobileSide ? 'expanded' : ''}`}>
           <div className="demo2 mb-25 t-thead-bg">
             <div className="container-fluid">
@@ -273,29 +320,8 @@ export default function Quotation() {
                           className="card-tab-links nav-tabs nav"
                           role="tablist"
                         >
-                          <li>
-                            <a
-                              className="active"
-                              href="#t_selling-today222"
-                              data-bs-toggle="tab"
-                              id="t_selling-today222-tab"
-                              role="tab"
-                              aria-selected="true"
-                            >
-                              Today
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              href="#t_selling-week222"
-                              data-bs-toggle="tab"
-                              id="t_selling-week222-tab"
-                              role="tab"
-                              aria-selected="true"
-                            >
-                              Week
-                            </a>
-                          </li>
+                          
+                          
                           <li>
                             <a
                               href="#t_selling-month333"
@@ -303,8 +329,13 @@ export default function Quotation() {
                               id="t_selling-month333-tab"
                               role="tab"
                               aria-selected="true"
+                              className='active'
+                              onClick={()=>
+                              {handleShow(); 
+                                setselectData('')}
+                              }
                             >
-                              Month
+                              Add New +
                             </a>
                           </li>
                         </ul>
@@ -318,7 +349,9 @@ export default function Quotation() {
                           role="tabpanel"
                           aria-labelledby="t_selling-today222-tab"
                         >
-                          <Table data={quotdatalist} columns={columns} pagination={pagination} setPagination={setPagination}/>
+                          <Table data={quotdatalist?.data?.docs??[]} columns={columns} pagination={pagination} 
+                          // setPagination={setPagination}
+                          />
                           
                         </div>
                       </div>
@@ -328,110 +361,93 @@ export default function Quotation() {
               </div>
             </div>
           </div>
-          <Modal show={show} onHide={handleClose}>
-            <Modal.Header closeButton>
-              <Modal.Title>Quotation Details</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-            {/* <FormikField name="jobId" label="Job ID" placeholder="1323" colWidth={6} /> */}
-              {/* <Form>
-                <Form.Group className="mb-3" controlId="formJobId">
-                  <Form.Label>Job ID</Form.Label>
-                  <Form.Control type="text" placeholder="1323" />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formName">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control type="text" placeholder="a tobcompany shf..." />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formName">
-                  <Form.Label>Contact</Form.Label>
-                  <Form.Control type="text" placeholder="+091 12 545 6546 " />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formFrom">
-                  <Form.Label>From</Form.Label>
-                  <Form.Control type="text" placeholder="place" />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formTo">
-                  <Form.Label>To</Form.Label>
-                  <Form.Control type="text" placeholder="to place" />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formDistance">
-                  <Form.Label>Distance</Form.Label>
-                  <Form.Control type="text" placeholder="110 km" />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="productDetails">
-                  <Form.Label>Product Details</Form.Label>
-                  <div>
-                    <img
-                      className="mt-1"
-                      src="/public/img/pdfimg.png"
-                      alt="PDF Icon"
-                      style={{
-                        width: '110px',
-                        height: '110px',
-                        cursor: 'pointer'
-                      }}
-                    />
-                  </div>
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formQuotePrice">
-                  <Form.Label>Quote Price</Form.Label>
-                  <Form.Control type="text" placeholder="1100 Aed" />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formDate">
-                  <Form.Label>Date</Form.Label>
-                  <Form.Control type="text" placeholder="13 Mar 2024" />
-                </Form.Group>
-              </Form> */}
+          <Commonmodal show={show} handleClose={handleClose} title={"Quoatation"}>
+            
+            
               <Formik
       initialValues={{
-        jobId: '',
-        name: '',
-        contact: '',
-        from: '',
-        to: '',
-        distance: '',
-        quotePrice: '',
-        date: '',
-        productDetails: null,
+        // jobId: selectData?.jobId||"",
+        name: selectData?.name||"",
+        contact: selectData?.contact||"",
+        from: selectData?.from||"",
+        to: selectData?.to||"",
+        distance: selectData?.distance||"",
+        quotePrice: selectData?.quotePrice||"",
+        date: selectData?.data||"",
+        productDetails: selectData?.productDetails||"",
       }}
       validate={values => {
         const errors = {};
-        if (!values.jobId) errors.jobId = 'Required';
-        if (!values.name) errors.name = 'Required';
-        if (!values.contact) errors.contact = 'Required';
-        if (!values.from) errors.from = 'Required';
-        if (!values.to) errors.to = 'Required';
-        if (!values.distance) errors.distance = 'Required';
-        if (!values.quotePrice) errors.quotePrice = 'Required';
+        // if (!values.jobId) errors.jobId = 'Required';
+        if (!values.name) errors.name = 'Name Required';
+        if (!values.contact) errors.contact = 'Contact Required';
+        if (!values.from) errors.from = 'From Location Required';
+        if (!values.to) errors.to = 'To Location Required';
+        if (!values.distance) errors.distance = 'Distance Required';
+        if (!values.quotePrice) errors.quotePrice = 'QuotePrice Required';
         // if (!values.date) errors.date = 'Required';
         // if (!values.productDetails) errors.productDetails = 'Product image is required';
         return errors;
       }}
-      onSubmit={(values, { setSubmitting }) => {
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2));
-          setSubmitting(false);
-        }, 400);
+      onSubmit={(values,actions ) => {
+        handleSubmit(values,actions)
       }}
     >
       {({
         handleSubmit,
         isSubmitting,
         setFieldValue,
-      }) => (
+        values
+      }) => {
+        console.log("values",values)
+        return(
         <Form onSubmit={handleSubmit}>
           <Row>
-            <FormikField name="jobId" label="Job ID" placeholder="1323" colWidth={12} />
-            <FormikField name="name" label="Name" placeholder="a tobcompany shf..." colWidth={12} />
-            <FormikField name="contact" label="Contact" placeholder="+091 12 545 6546" colWidth={12} />
+            {/* <FormikField name="jobId" label="Job ID" placeholder="1323" disabled colWidth={12} /> */}
+            <FormikField name="name" label="Name" placeholder="company name" colWidth={12}/>
+            <FormikField name="contact" label="Contact" placeholder="contact number" colWidth={12} />
           </Row>
           <Row>
-            <FormikField name="from" label="From" placeholder="place" colWidth={6} />
-            <FormikField name="to" label="To" placeholder="to place" colWidth={6} />
+            {/* <FormikField name="from" label="From" placeholder="from place" colWidth={6} />
+            <FormikField name="to" label="To" placeholder="to place" colWidth={6} /> */}
+            <SingleSelect
+            name="from"
+            label="From "
+            placeholder="Select from"
+            className="w-100"
+            options={optionPlaces??[]}
+            colWidth={6}  
+            onChange={(value)=>{
+              setFieldValue("from",value.value);
+              setFieldValue("fromlat",value.lat);
+              setFieldValue("fromlon",value.lon);
+              setFieldValue("distance",calculatedistance(value?.lat,value.lon,values?.tolat,values?.tolon));
+            //  calculatedistance(value?.lat,value.lon,values?.tolat,values?.tolon,setFieldValue)
+              
+            }
+              
+            }
+            // options={pricedataOption.filter(option => option.value !== 1) || []}
+            variant="border" 
+          />   
+            <SingleSelect
+            name="to"
+            label="To "
+            placeholder="Select to"
+            className="w-100"
+            options={optionPlaces??[]}
+            onChange={(value)=>{
+              setFieldValue("distance",calculatedistance(values?.fromlat,values?.fromlon,value.lat,value.lon,));
+              // calculatedistance(values?.fromlat,values?.fromlon,value?.lat,value.lon)
+            }
+            }
+            colWidth={6} 
+            // options={pricedataOption.filter(option => option.value !== 1) || []}
+            variant="border"  
+          />   
           </Row>
           <Row>
-            <FormikField name="distance" label="Distance" placeholder="110 km" colWidth={12} />
+            <FormikField name="distance" label="Distance" placeholder="distacnce " disabled colWidth={12} />
           </Row>
           <Row>
             {/* <Form.Group className="mb-3" controlId="productDetails">
@@ -455,26 +471,28 @@ export default function Quotation() {
             <FormikField name="productDetails" label="Product Details" type = 'file' colWidth={12} />
           </Row>
           <Row>
-            <FormikField name="quotePrice" label="Quote Price" type = 'number' placeholder="1100 Aed" colWidth={12} />
+            <FormikField name="quotePrice" label="Quote Price" type = 'number' placeholder="quote price" colWidth={12} />
             <FormikField name="date" label="Date" type = 'date'  placeholder="13 Mar 2024"  colWidth={12} disabled={true} />
           </Row>
-
+          <Modal.Footer>
+          <Button variant="primary"  type="submit" disabled={isSubmitting}>
+                Add job
+              </Button>
+        </Modal.Footer>
           
         </Form>
-      )}
+      )}}
     </Formik>
-            </Modal.Body>
-            <Modal.Footer>
-              {/* <Button variant="secondary" type='submit' disabled={isSubmitting}  >
-                Close
-              </Button> */}
+
+            {/* <Modal.Footer>
+              
               <Button variant="primary" onClick={handleClose}>
                 Add job
               </Button>
-            </Modal.Footer>
-          </Modal>
+            </Modal.Footer> */}
+          </Commonmodal>
         </div>
-      )}
+      )
     </>
   );
 }

@@ -1,53 +1,81 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Form, Col } from 'react-bootstrap';
-import { useField,useFormikContext } from 'formik';
+import { useField, useFormikContext } from 'formik';
+import { BaseUrl, uploadapi } from '../services/BaseUrls';
 
-// Custom Formik Field Component with dynamic column width
-const FormikField = ({ label, name, type , placeholder, colWidth = 12 , disabled = false }) => {
+const FormikField = ({ label, name, type, placeholder, colWidth = 12, disabled = false, uploadUrl }) => {
   const [field, meta] = useField(name); // Hooks into Formik's context
   const { setFieldValue } = useFormikContext();
+  const fileInputRef = useRef(null); // Reference to the hidden file input
+  
+  const handleImageClick = () => {
+    fileInputRef.current.click(); // Trigger the hidden file input
+  };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0]; // Get the uploaded file
+  const handleImageChange = async (e) => {
+    const file = e.target.files; // Get the uploaded file
     if (file) {
-      setFieldValue(name, file); // Update Formik's field value
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result); // Update preview once file is read
-      };
-      reader.readAsDataURL(file); // Read the file
+      const filesArray = Array.isArray(file) ? file : [file];
+      // setFieldValue(name, file[0]); // Update Formik's field value
+      // console.log("filefilefilefile",file[0])
+      const formData = new FormData();
+      formData.append('files', file[0]);
+
+      try {
+        const response = await fetch(BaseUrl+uploadapi, {
+          method: 'POST',
+          body: formData,
+        });
+        // console.log("..................",response)
+        const result = await response.json();
+        console.log('Upload successful:', result);
+        setFieldValue(name,result.data) 
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
     }
   };
+
   return (
-    <Col md={colWidth}>     
-      <Form.Group className="mb-3" controlId={`form${name}`}>      
+    <Col md={colWidth}>
+      <Form.Group className="mb-3" controlId={`form${name}`}>
         <Form.Label>{label}</Form.Label>
-        {type==="file"?
-        <div>
-        <img
-          className="mt-1"
-          src="/public/img/pdfimg.png"
-          alt="PDF Icon"
-          style={{
-            width: "110px",
-            height: "110px",
-            cursor: "pointer"
-          }}
-        />
-      </div>
-        :
-        <Form.Control
-        type={type}
-        placeholder={placeholder}
-        {...field} // Spread Formik's field props
-        disabled={disabled}
-      />}
-        
+        {type === 'file' ? (
+          <div>
+            <img
+              className="mt-1"
+              src="/public/img/pdfimg.png"
+              alt="PDF Icon"
+              style={{
+                width: '110px',
+                height: '110px',
+                cursor: 'pointer',
+              }}
+              onClick={handleImageClick}
+            />
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept=".pdf"
+              onChange={handleImageChange}
+            />
+          </div>
+        ) : (
+          <Form.Control
+            type={type}
+            placeholder={placeholder}
+            {...field} // Spread Formik's field props
+            disabled={disabled}
+          />
+        )}
+
         {meta.touched && meta.error ? (
-          <div className="text-danger">{meta.error}</div>
+          <div className="text-danger small">{meta.error}</div>
         ) : null}
-      </Form.Group> 
+      </Form.Group>
     </Col>
   );
 };
+
 export default FormikField;

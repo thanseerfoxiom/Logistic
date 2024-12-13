@@ -1,16 +1,27 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { loginPath } from "../services/PathUrls";
-import { basePath } from "../services/UrlPaths";
+import { loginPath } from "../services/UrlPaths";
+import { ContextDatas } from "../services/Context";
+
 
 function PrivateRoute({ children }) {
-  const user = true;
+  const { user } = useContext(ContextDatas)
 
-  if (user === null || user === false) {
-    return <Navigate to={basePath + loginPath} />;
-  }
+    if (!user)
+    {
+        return <Navigate to={loginPath} />
+    }
+     if ( user != undefined || user !=null ) {
+        // not logged in so redirect to login page with the return url
+        // return <Navigate to={login} />
+        return children;
 
-  return children;
+    }
+    else
+    {
+        return <Navigate to={loginPath} />
+    }
+
+
 }
-
-export default PrivateRoute;
+export default PrivateRoute

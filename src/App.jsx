@@ -27,14 +27,16 @@ import Finance from "./pages/private/finance/Finance";
 import Drivers from "./pages/private/drivers/Drivers";
 import Trucks from "./pages/private/Trucks/Trucks";
 import Details from "./pages/private/finance/Details";
+import PrivateRoute from "./utils/PrivateRoute";
 
 
 function App() {
+
   return (
     <div>
       <Routes>
         <Route path="/login" element={<PageLogin />} />
-        <Route path={basePath} element={<RouterConnection />}>
+        <Route path={basePath} element={<PrivateRoute><RouterConnection /></PrivateRoute>}>
           <Route index element={<PageDashboard />} />
          
           <Route

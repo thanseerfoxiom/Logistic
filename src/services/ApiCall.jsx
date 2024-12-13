@@ -8,7 +8,6 @@ export const ApiCall = async (method, endPoint, data, params, is_formdata) => {
     platform: "web",
   };
   var url = BaseUrl + endPoint;
-
   try {
     const res = await axios({
       method,

@@ -1,18 +1,49 @@
-import React from "react";
-import { useFormik } from "formik";
+import React, { useContext, useState } from "react";
+import { Formik } from "formik";
 import { loginValidationSchema } from "../../utils/Validation";
+import FormikField from "../../components/InputComponents"; // Adjust the import path as needed
+import { Form, Button, Row } from "react-bootstrap";
+import { useCustomMutation } from "../../services/useCustomMutation";
+import { userloginapi } from "../../services/BaseUrls";
+import { useNavigate } from "react-router-dom";
+import { basePath } from "../../services/UrlPaths";
+import { ContextDatas } from "../../services/Context";
 
 function PageLogin() {
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validationSchema: loginValidationSchema,
-    onSubmit: (values) => {
-      //login function will be call here
-    },
-  });
+  const {user, setuser}=useContext(ContextDatas)
+  const { mutation } = useCustomMutation();
+  const [show, setShow] = useState(false);
+  const navigate = useNavigate();
+  const handleSubmit = (values, actions) => {
+    mutation.mutate(
+      {
+        method: "post",
+        url: userloginapi,
+        values: { ...values },
+        next: () => {
+          actions.resetForm();
+          actions.setSubmitting(false);
+        },
+        
+      },
+      {
+        onSuccess: (data) => {
+          // Access the response data here
+          console.log("Response Data:", data);
+          if(data.token){
+            setuser(data.token)
+            localStorage.setItem("token",data.token)
+            navigate(basePath)
+          }
+          // actions.resetForm();
+          // actions.setSubmitting(false);
+        },
+        onError: (error) => {
+          actions.setSubmitting(false);
+        },
+      }
+    );
+  };
 
   return (
     <div>
@@ -26,64 +57,99 @@ function PageLogin() {
                     <a href="/">
                       <img
                         className="dark"
-                        src="/img/clarita/logo.svg"
-                        alt
+                        src="/img/logo/logo1-01.png"
+                        alt="logo"
                         width={40}
                       />
-                      <img className="light" src="/img/clarita/logo.svg" alt />
+                      <img className="light" src="/img/logo/logo1-01.png" alt={"logo"} />
                     </a>
                   </div>
                   <div className="card border-0">
-                    <div className="card-header">
+                    <div className="card-header ">
                       <div className="edit-profile__title">
-                        <h6>Sign in Clarita Admin</h6>
+                        <h6>Sign in to TAKHLEES</h6>
                       </div>
                     </div>
                     <div className="card-body">
                       <div className="edit-profile__body">
-                        <div className="form-group mb-25">
-                          <label htmlFor="username">
-                            Username or Email Address
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="username"
-                            placeholder="name@example.com"
-                          />
-                        </div>
-                        <div className="form-group mb-15">
-                          <label htmlFor="password-field">password</label>
-                          <div className="position-relative">
-                            <input
-                              id="password-field"
-                              type="password"
-                              className="form-control"
-                              name="password"
-                              placeholder="Password"
-                            />
-                            <div className="uil uil-eye-slash text-lighten fs-15 field-icon toggle-password2"></div>
-                          </div>
-                        </div>
-                        <div className="admin-condition">
-                          <div className="checkbox-theme-default custom-checkbox ">
-                            <input
-                              className="checkbox"
-                              type="checkbox"
-                              id="check-1"
-                            />
-                            <label htmlFor="check-1">
-                              <span className="checkbox-text">
-                                Keep me logged in
-                              </span>
-                            </label>
-                          </div>
-                        </div>
-                        <div className="admin__button-group button-group d-flex pt-1 justify-content-md-start justify-content-center">
-                          <button className="btn btn-primary btn-default w-100 btn-squared text-capitalize lh-normal px-50 signIn-createBtn ">
-                            sign in
-                          </button>
-                        </div>
+                        <Formik
+                          initialValues={{
+                            email: "",
+                            password: "",
+                            role: "super_admin",
+                          }}
+                          validationSchema={loginValidationSchema}
+                          onSubmit={(values, actions) => {
+                            handleSubmit(values, actions);
+                          }}
+                        >
+                          {({
+                            handleSubmit,
+                            isSubmitting,
+                            handleChange,
+                            handleBlur,
+                            values,
+                            errors,
+                            touched,
+                          }) => (
+                            <Form onSubmit={handleSubmit}>
+                              <Row>
+                                <FormikField
+                                  name="email"
+                                  label="Email Address"
+                                  placeholder="name@example.com"
+                                  type="text"
+                                  colWidth={12}
+                                  onChange={handleChange}
+                                  onBlur={handleBlur}
+                                  value={values.email}
+                                  isInvalid={touched.email && errors.email}
+                                  error={errors.email}
+                                />
+                              </Row>
+                              <Row>
+                                <Form.Group className="mb-3" controlId="password-field">
+                                  <Form.Label>Password</Form.Label>
+                                  <div className="position-relative">
+                                    <Form.Control
+                                      type={show ? "text" : "password"}
+                                      name="password"
+                                      placeholder="Password"
+                                      onChange={handleChange}
+                                      onBlur={handleBlur}
+                                      value={values.password}
+                                      isInvalid={touched.password && errors.password}
+                                    />
+                                    <div
+                                      onClick={() => setShow(!show)}
+                                      className={`${
+                                        show ? "uil-eye-slash" : "uil-eye"
+                                      } text-lighten fs-15 field-icon toggle-password2 cursor-true`}
+                                    ></div>
+                                    {touched.password && errors.password ? (
+                                      <Form.Control.Feedback type="invalid">
+                                        {errors.password}
+                                      </Form.Control.Feedback>
+                                    ) : null}
+                                  </div>
+                                </Form.Group>
+                              </Row>
+                              <Row>
+                                <div className="">
+                                  <Button
+                                    // variant="primary"
+                                    type="submit"
+                                    className="btn- w-100 btn-squared text-capitalize lh-normal px-50 signIn-createBtn btndefault"
+                                    
+                                    disabled={isSubmitting}
+                                  >
+                                    Sign in
+                                  </Button>
+                                </div>
+                              </Row>
+                            </Form>
+                          )}
+                        </Formik>
                       </div>
                     </div>
                   </div>
@@ -93,16 +159,6 @@ function PageLogin() {
           </div>
         </div>
       </main>
-      <div id="overlayer">
-        <div className="loader-overlay">
-          <div className="dm-spin-dots spin-lg">
-            <span className="spin-dot badge-dot dot-primary" />
-            <span className="spin-dot badge-dot dot-primary" />
-            <span className="spin-dot badge-dot dot-primary" />
-            <span className="spin-dot badge-dot dot-primary" />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

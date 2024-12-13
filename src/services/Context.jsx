@@ -5,6 +5,8 @@ export const ContextDatas = createContext();
 const Context = ({ children }) => {
   const [urlPath, setUrlPath] = useState(window.location.pathname ?? "/");
   const [mobileSide, setmobileSide] = useState(false);
+  const [pageLoading, setpageLoading] = useState(true);
+  const [user, setuser] = useState(localStorage.getItem("token"))
 
   return (
     <ContextDatas.Provider
@@ -13,6 +15,8 @@ const Context = ({ children }) => {
         setmobileSide,
         urlPath,
         setUrlPath,
+        pageLoading, setpageLoading,
+        user, setuser
       }}
     >
       {children}
