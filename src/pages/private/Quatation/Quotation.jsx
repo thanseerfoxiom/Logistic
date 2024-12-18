@@ -19,6 +19,7 @@ import places from '../../../json/places.json'
 import { calculateDistance } from '../../../utils/calculateDistance.js';
 import { Trash2 } from 'lucide-react';
 import { uploadapi } from '../../../services/BaseUrls.jsx';
+import { formatDate } from '../../../utils/dateConvert.js';
 
 export default function Quotation() {
   const [pageLoading, setpageLoading] = useState(true);
@@ -60,22 +61,27 @@ export default function Quotation() {
       console.log(error)
     }
   }
-  const handleDeleteImage =(image)=>{
+  const handleDeleteImage =(image,setFieldValue,values)=>{
     try {
       mutation.mutate({
         method:"post",
         url: `${uploadapi}`,
         values:{previousFiles:image},
         key:'quotation',
-        next: () => {
-          // Remove 'item' from 'productDetails'
+      },
+      {
+        onSuccess: () => {
           let newArr = values.productDetails.filter(ite => ite !== image);
-          console.log("Updated Array:", newArr);
+          // console.log("Updated Array:", newArr);
           setFieldValue("productDetails", newArr);
         },
-      })
+        onError: (error) => {
+          console.log(error)
+        },
+      }
+    )
     } catch (error) {
-      
+      console.log(error)
     }
   }
   const handleSubmit = (values, actions) => {
@@ -393,7 +399,7 @@ export default function Quotation() {
         to: selectData?.to||"",
         distance: selectData?.distance||"",
         quotePrice: selectData?.quotePrice||"",
-        date: selectData?.data||"",
+        date: selectData?.date|| formatDate(new Date().toISOString()),
         productDetails: selectData?.productDetails||"",
       }}
       validate={values => {
@@ -580,9 +586,7 @@ export default function Quotation() {
             color: 'red',
           }}
           onClick={() => {
-            handleDeleteImage(item)
-            console.log('Delete clicked for:', item);
-            // Add your delete logic here
+            handleDeleteImage(item,setFieldValue,values)
           }}
         />
       </div>
@@ -596,7 +600,7 @@ export default function Quotation() {
           </Row>
           <Row>
             <FormikField name="quotePrice" label="Quote Price" type = 'number' placeholder="quote price" colWidth={12} />
-            {/* <FormikField name="date" label="Date" type= 'date'  placeholder="13 Mar 2024"  colWidth={12} disabled={true} /> */}
+            <FormikField name="date" label="Date" type= 'date'  placeholder="13 Mar 2024"  colWidth={12}  />
           </Row>
           <Modal.Footer>
           <Button variant="primary"  type="submit" disabled={isSubmitting}>

@@ -16,8 +16,11 @@ export const useCustomMutation = () => {
         ShowToast(response?.message?.message, "success");
         if(key){
           queryClient.invalidateQueries([key]);
+          
         }
-        next();
+        if(next){
+          next();
+        }
         return  response?.message?.data;
       } else {
      
