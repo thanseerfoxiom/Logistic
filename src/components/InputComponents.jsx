@@ -2,12 +2,12 @@ import React, { useRef } from 'react';
 import { Form, Col } from 'react-bootstrap';
 import { useField, useFormikContext } from 'formik';
 import { BaseUrl, uploadapi } from '../services/BaseUrls';
-
+import { FileUp } from 'lucide-react';
 const FormikField = ({ label, name, type, placeholder, colWidth = 12, disabled = false, uploadUrl }) => {
   const [field, meta] = useField(name); // Hooks into Formik's context
-  const { setFieldValue } = useFormikContext();
+  const { setFieldValue ,values} = useFormikContext();
   const fileInputRef = useRef(null); // Reference to the hidden file input
-  
+
   const handleImageClick = () => {
     fileInputRef.current.click(); // Trigger the hidden file input
   };
@@ -29,7 +29,9 @@ const FormikField = ({ label, name, type, placeholder, colWidth = 12, disabled =
         // console.log("..................",response)
         const result = await response.json();
         console.log('Upload successful:', result);
-        setFieldValue(name,result.data) 
+        // setFieldValue(name,result.data) 
+        const currentValues = Array.isArray(values[name]) ? values[name] : [];
+        setFieldValue(name, [...currentValues, ...result.data]);
       } catch (error) {
         console.error('Error uploading file:', error);
       }
@@ -41,8 +43,9 @@ const FormikField = ({ label, name, type, placeholder, colWidth = 12, disabled =
       <Form.Group className="mb-3" controlId={`form${name}`}>
         <Form.Label>{label}</Form.Label>
         {type === 'file' ? (
+         
           <div>
-            <img
+            {/* <img
               className="mt-1"
               src="/public/img/pdfimg.png"
               alt="PDF Icon"
@@ -52,7 +55,19 @@ const FormikField = ({ label, name, type, placeholder, colWidth = 12, disabled =
                 cursor: 'pointer',
               }}
               onClick={handleImageClick}
-            />
+            /> */}
+            
+                  <FileUp strokeWidth={0.5}   style={{
+                width: '90px',
+                height: '90px',
+                cursor: 'pointer',
+              }}
+              // onClick={handleImageChange}
+              onClick={() => fileInputRef.current.click()}
+              />
+               <p style={{ marginLeft: '8px', fontSize: '14px', color: '#555', cursor: 'pointer' }} onClick={() => fileInputRef.current.click()}>
+    Upload Files
+  </p>
             <input
               type="file"
               ref={fileInputRef}

@@ -17,6 +17,9 @@ import Commonmodal from '../../../components/modal/Commonmodal.jsx';
 import SingleSelect from '../../../components/ui/SingleSelect.jsx';
 import places from '../../../json/places.json'
 import { calculateDistance } from '../../../utils/calculateDistance.js';
+import { Trash2 } from 'lucide-react';
+import { uploadapi } from '../../../services/BaseUrls.jsx';
+
 export default function Quotation() {
   const [pageLoading, setpageLoading] = useState(true);
   const { mobileSide } = useContext(ContextDatas);
@@ -50,25 +53,44 @@ export default function Quotation() {
       mutation.mutate({
         method: "delete",
         url: `${productsapi}/${deleteId}`,
-        key:'product',
+        key:'quotation',
        
       });
     } catch (error) {
       console.log(error)
     }
   }
+  const handleDeleteImage =(image)=>{
+    try {
+      mutation.mutate({
+        method:"post",
+        url: `${uploadapi}`,
+        values:{previousFiles:image},
+        key:'quotation',
+        next: () => {
+          // Remove 'item' from 'productDetails'
+          let newArr = values.productDetails.filter(ite => ite !== image);
+          console.log("Updated Array:", newArr);
+          setFieldValue("productDetails", newArr);
+        },
+      })
+    } catch (error) {
+      
+    }
+  }
   const handleSubmit = (values, actions) => {
-    console.log("values",values)
+    console.log("values...............................",values)
     return 
     const apiurl = values?.id? `${productsapi}/${values.id}` : productsapi;
     mutation.mutate({
         method: values?.id? "put":"post",
         url: apiurl,
         values: { ...values },
-        key: "product",
+        key: "quotation",
         next: () => {
           handleClose(); 
           actions.resetForm()
+       
           setdata(null)
         },
     },       { onError: (error) => {
@@ -78,8 +100,6 @@ export default function Quotation() {
   };
 
   const [productImagePreview, setProductImagePreview] = useState(null);
-
-  
   // Data for the table
   // const quotdatalist = useMemo(() => [
   //   {
@@ -228,8 +248,8 @@ export default function Quotation() {
   // Column definitions
   const calculatedistance = (fromlat,fromlon,tolat,tolon)=>{
     try {
-      console.log("fromlat",`${fromlat},${fromlon}`)
-      console.log("toooooo",`${tolat},${tolon}`)
+      // console.log("fromlat",`${fromlat},${fromlon}`)
+      // console.log("toooooo",`${tolat},${tolon}`)
       if(fromlat && tolat){
         const data = calculateDistance(fromlat,fromlon,tolat,tolon)
         return data.toFixed(2)
@@ -468,24 +488,125 @@ export default function Quotation() {
                 </div>
               )}
             </Form.Group> */}
+            
             <FormikField name="productDetails" label="Product Details" type = 'file' colWidth={12} />
+            {/* {values?.productDetails.length?(
+              values?.productDetails?.map((item)=>(
+                <div>
+                <img
+             
+            src="/public/img/pdfimg.png"
+            alt="PDF Icon"
+            style={{
+              marginBottom: '10px',
+              textAlign: 'center',
+              maxWidth: '100px', // Adjust to limit space
+            }}
+         
+          />
+          <div>
+          <p
+        style={{
+          fontSize: '14px',
+          color: '#555',
+          cursor: 'pointer',
+          width: '80px', // Fixed width for the text
+          overflow: 'hidden', // Hide overflow text
+          whiteSpace: 'nowrap', // Prevent text from wrapping 
+          // margin: '5px auto 0', // Center the text and provide spacing
+        }}
+        title={item} // Tooltip to show full text on hover
+      >
+        {item}
+      </p>
+      <Trash2 size={20}/>
+          </div>
+          
+        </div>))
+            )
+            :""} */}
+            {values?.productDetails.length ? (
+  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}> 
+    {/* Flex container to display items in a row */}
+    {values?.productDetails?.map((item, index) => (
+      <div
+        key={index}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center', // Center content vertically
+          justifyContent: 'center',
+          textAlign: 'center',
+          position: 'relative', // For positioning the delete button
+          width: '100px',
+        }}
+      >
+        {/* PDF Icon */}
+        <img
+          src="/public/img/pdfimg.png"
+          alt="PDF Icon"
+          style={{
+            width: '80px',
+            height: '80px',
+            marginBottom: '5px',
+          }}
+        />
+
+        {/* Text underneath */}
+        <p
+          style={{
+            fontSize: '14px',
+            color: '#555',
+            cursor: 'pointer',
+            width: '100px', // Set fixed width for text
+            overflow: 'hidden', // Hide overflow text
+            whiteSpace: 'nowrap', // Keep text in a single line
+            textOverflow: 'ellipsis', // Add ellipsis if text overflows
+            margin: 0,
+          }}
+          title={item} // Full text on hover
+        >
+          {item}
+        </p>
+
+        {/* Delete Button */}
+        <Trash2
+          size={18}
+          style={{
+            position: 'absolute',
+            top: '5px',
+            right: '5px',
+            cursor: 'pointer',
+            color: 'red',
+          }}
+          onClick={() => {
+            handleDeleteImage(item)
+            console.log('Delete clicked for:', item);
+            // Add your delete logic here
+          }}
+        />
+      </div>
+    ))}
+  </div>
+) : (
+  null
+)}
+          </Row>
+          <Row>
           </Row>
           <Row>
             <FormikField name="quotePrice" label="Quote Price" type = 'number' placeholder="quote price" colWidth={12} />
-            <FormikField name="date" label="Date" type = 'date'  placeholder="13 Mar 2024"  colWidth={12} disabled={true} />
+            {/* <FormikField name="date" label="Date" type= 'date'  placeholder="13 Mar 2024"  colWidth={12} disabled={true} /> */}
           </Row>
           <Modal.Footer>
           <Button variant="primary"  type="submit" disabled={isSubmitting}>
                 Add job
               </Button>
         </Modal.Footer>
-          
         </Form>
       )}}
     </Formik>
-
-            {/* <Modal.Footer>
-              
+            {/* <Modal.Footer>  
               <Button variant="primary" onClick={handleClose}>
                 Add job
               </Button>
