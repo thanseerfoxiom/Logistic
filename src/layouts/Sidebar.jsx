@@ -41,7 +41,7 @@ function Sidebar() {
                 to={basePath + quotationPath}
                 onClick={() => setUrlPath(basePath + quotationPath)}
               >
-                <span className="nav-icon uil uil-users-alt" />
+                <span className="nav-icon uil uil-truck-loading" />
                 <span className="menu-text">Quotation</span>
                 {/* <span className="badge badge-info-10 menuItem rounded-pill">
               1.1.7
@@ -54,7 +54,7 @@ function Sidebar() {
                 to={basePath + jobsPath}
                 onClick={() => setUrlPath(basePath + jobsPath)}
               >
-                <span className="nav-icon uil uil-users-alt" />
+                <span className="nav-icon uil uil-bag" />
                 <span className="menu-text">jobs</span>
                 {/* <span className="badge badge-info-10 menuItem rounded-pill">
               1.1.7
@@ -68,7 +68,7 @@ function Sidebar() {
                 to={basePath + driversPath}
                 onClick={() => setUrlPath(basePath + driversPath)}
               >
-                <span className="nav-icon uil uil-usd-circle" />
+                <span className="nav-icon uil uil-car-sideview" />
                 <span className="menu-text">Drivers</span>
                 {/* <span className="badge badge-info-10 menuItem rounded-pill">
               1.1.7
@@ -81,7 +81,7 @@ function Sidebar() {
                 to={basePath + truckPath}
                 onClick={() => setUrlPath(basePath + truckPath)}
               >
-                <span className="nav-icon uil uil-usd-circle" />
+                <span className="nav-icon uil uil-truck" />
                 <span className="menu-text">Trucks and Price</span>
                 {/* <span className="badge badge-info-10 menuItem rounded-pill">
               1.1.7

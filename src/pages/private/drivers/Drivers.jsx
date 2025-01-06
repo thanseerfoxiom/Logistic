@@ -12,6 +12,8 @@ import { Row } from "react-bootstrap";
 import FormikField from "../../../components/InputComponents.jsx";
 // --- Custom SingleSelect component ---
 import SingleSelect from "../../../components/ui/SingleSelect.jsx";
+import { fetchDriver } from "../../../api/index.js";
+import { useFetchData } from "../../../services/useQueryFetchData.js";
 
 export default function Drivers() {
   const [pageLoading, setPageLoading] = useState(true);
@@ -21,7 +23,8 @@ export default function Drivers() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
+  const { data: driverlist} = useFetchData('driver',fetchDriver);
+  console.log("driverdta",driverlist)
   // Holds data for the currently selected driver (for editing)
   const [selectedDriver, setSelectedDriver] = useState(null);
 
@@ -39,8 +42,8 @@ export default function Drivers() {
       truckPermission: "/public/img/pdfimg.png",
     },
     {
-      id: 1323,
-      name: "a tobcompany shfbs sdufbsd fuisdif u",
+      id: 1324,
+      name: "a tobcompany ",
       location: "Dubai",
       contact: "+971 58 123 4567",
       vehicleNo: "ABC-1234",
