@@ -11,30 +11,39 @@ import Table from '../../../components/Table';
 import FormikField from '../../../components/InputComponents.jsx';
 import { Formik } from 'formik';
 import { Form, Button, Row } from 'react-bootstrap';
-import { fetchQuatation } from '../../../api/index.js';
+import { fetchQuatation, fetchvehicle } from '../../../api/index.js';
 import { useCustomMutation } from '../../../services/useCustomMutation.js';
 import Commonmodal from '../../../components/modal/Commonmodal.jsx';
 import SingleSelect from '../../../components/ui/SingleSelect.jsx';
 import places from '../../../json/places.json'
 import { calculateDistance } from '../../../utils/calculateDistance.js';
 import { Trash2 } from 'lucide-react';
-import { uploadapi } from '../../../services/BaseUrls.jsx';
+import { quotationapi, uploadapi } from '../../../services/BaseUrls.jsx';
 import { formatDate } from '../../../utils/dateConvert.js';
+import ConfirmationDialog from '../../../components/modal/ConfirmationDialog.jsx';
 
 export default function Quotation() {
   const [pageLoading, setpageLoading] = useState(true);
-  const { mobileSide } = useContext(ContextDatas);
+  const { mobileSide,optionPlaces } = useContext(ContextDatas);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [selectData,setselectData] =useState('')
+  const [isloading,setisloading]= useState(false)
   const [pagination,setPagination] =useState({
     pageIndex:0,
     pageSize:10
   })
+  const [confirmationState,setConfirmationState]=useState(false)
   const {mutation} = useCustomMutation();
   const { data: quotdatalist} = useFetchData('quotation',fetchQuatation);
+  const { data: vehiclelist} = useFetchData('vehicle',fetchvehicle);
   console.log("padataa",quotdatalist?.data?.docs)
+  console.log("vehiclelist",vehiclelist?.data?.docs)
+  const optionvehicles = vehiclelist?.data?.docs?.map(item=>({
+    value:item.id,
+    label:item.name,
+  }))
   // useEffect(() => {
   //   const timer = setTimeout(() => {
   //     setpageLoading(false);
@@ -43,24 +52,23 @@ export default function Quotation() {
   //   return () => clearTimeout(timer);
   // }, []);
   // console.log("places",places)
-  const optionPlaces = places?.map(item=>({
-    value:item.city,
-    label:item.city,
-    lat:item.latitude,
-    lon:item.longitude
-  }))
+  // const optionPlaces = places?.map(item=>({
+  //   value:item.city,
+  //   label:item.city,
+  //   lat:item.latitude,
+  //   lon:item.longitude
+  // }))
   const handleDelete=()=>{
     try {
       mutation.mutate({
         method: "delete",
-        url: `${productsapi}/${deleteId}`,
+        url: `${quotationapi}/${deleteId}`,
         key:'quotation',
-       
       });
     } catch (error) {
       console.log(error)
-    }
-  }
+    }}
+
   const handleDeleteImage =(image,setFieldValue,values)=>{
     try {
       mutation.mutate({
@@ -84,25 +92,33 @@ export default function Quotation() {
       console.log(error)
     }
   }
-  const handleSubmit = (values, actions) => {
-    console.log("values...............................",values)
-    return 
-    const apiurl = values?.id? `${productsapi}/${values.id}` : productsapi;
-    mutation.mutate({
-        method: values?.id? "put":"post",
-        url: apiurl,
-        values: { ...values },
-        key: "quotation",
-        next: () => {
-          handleClose(); 
-          actions.resetForm()
-       
-          setdata(null)
-        },
-    },       { onError: (error) => {
+  const handleSubmit2 = (values, actions,createJob) => {
+    // console.log("values...............................",values)
+    // return 
+    try {
+      if(createJob){
+        values.createJob = true
+      }
+      const apiurl = values?._id?`${quotationapi}/${values._id}` : quotationapi;
+      mutation.mutate({
+          method: values?._id? "put":"post",
+          url: apiurl,
+          values: {...values},
+          key: "quotation",
+          next: () => {
+            handleClose(); 
+            actions.resetForm()
+            actions.setSubmitting(false)
+            setdata(null)
+          },
+      },       { onError: (error) => {
+        actions.setSubmitting(false); 
+      },}
+    );
+    } catch (error) {
+      console.log(error)
       actions.setSubmitting(false); 
-    },}
-  );
+    }
   };
 
   const [productImagePreview, setProductImagePreview] = useState(null);
@@ -286,6 +302,7 @@ export default function Quotation() {
     {
       header: 'Distance',
       accessorKey: 'distance',
+      size:110,
     },
     {
       header: 'Vehicle Type',
@@ -294,10 +311,15 @@ export default function Quotation() {
     {
       header: 'Price',
       accessorKey: 'quotePrice',
+      size:110,
     },
     {
       header: 'Date',
       accessorKey: 'date',
+      size:125,
+      cell:({row})=>(
+        formatDate(row.original.date)
+      )
     },
     {
       header: 'Action',
@@ -328,8 +350,6 @@ export default function Quotation() {
     )
     },
   ], []);
-  
- 
   return (
     <>
        (
@@ -346,8 +366,6 @@ export default function Quotation() {
                           className="card-tab-links nav-tabs nav"
                           role="tablist"
                         >
-                          
-                          
                           <li>
                             <a
                               href="#t_selling-month333"
@@ -388,9 +406,7 @@ export default function Quotation() {
             </div>
           </div>
           <Commonmodal show={show} handleClose={handleClose} title={"Quoatation"}>
-            
-            
-              <Formik
+          <Formik
       initialValues={{
         // jobId: selectData?.jobId||"",
         name: selectData?.name||"",
@@ -401,6 +417,9 @@ export default function Quotation() {
         quotePrice: selectData?.quotePrice||"",
         date: selectData?.date|| formatDate(new Date().toISOString()),
         productDetails: selectData?.productDetails||"",
+        ...(selectData?._id ? { _id: selectData._id } : {}),
+        
+
       }}
       validate={values => {
         const errors = {};
@@ -416,16 +435,19 @@ export default function Quotation() {
         return errors;
       }}
       onSubmit={(values,actions ) => {
-        handleSubmit(values,actions)
+        handleSubmit2(values,actions)
       }}
     >
       {({
         handleSubmit,
         isSubmitting,
+        resetForm,
+        setSubmitting,
         setFieldValue,
         values
       }) => {
         console.log("values",values)
+        console.log("selectData",selectData)
         return(
         <Form onSubmit={handleSubmit}>
           <Row>
@@ -448,10 +470,8 @@ export default function Quotation() {
               setFieldValue("fromlat",value.lat);
               setFieldValue("fromlon",value.lon);
               setFieldValue("distance",calculatedistance(value?.lat,value.lon,values?.tolat,values?.tolon));
-            //  calculatedistance(value?.lat,value.lon,values?.tolat,values?.tolon,setFieldValue)
-              
-            }
-              
+            //  calculatedistance(value?.lat,value.lon,values?.tolat,values?.tolon,setFieldValue)         
+            }    
             }
             // options={pricedataOption.filter(option => option.value !== 1) || []}
             variant="border" 
@@ -494,43 +514,22 @@ export default function Quotation() {
                 </div>
               )}
             </Form.Group> */}
-            
+            <SingleSelect
+            name="vehicleType"
+            label="Vehicle Type "
+            placeholder="Select VehicleType"
+            className="w-100"
+            options={optionvehicles??[]}
+            onChange={(value)=>{
+              // setFieldValue("distance",calculatedistance(values?.fromlat,values?.fromlon,value.lat,value.lon,));
+              // calculatedistance(values?.fromlat,values?.fromlon,value?.lat,value.lon)
+            }
+            }
+            colWidth={6} 
+            // options={pricedataOption.filter(option => option.value !== 1) || []}
+            variant="border"  
+          /> 
             <FormikField name="productDetails" label="Product Details" type = 'file' colWidth={12} />
-            {/* {values?.productDetails.length?(
-              values?.productDetails?.map((item)=>(
-                <div>
-                <img
-             
-            src="/public/img/pdfimg.png"
-            alt="PDF Icon"
-            style={{
-              marginBottom: '10px',
-              textAlign: 'center',
-              maxWidth: '100px', // Adjust to limit space
-            }}
-         
-          />
-          <div>
-          <p
-        style={{
-          fontSize: '14px',
-          color: '#555',
-          cursor: 'pointer',
-          width: '80px', // Fixed width for the text
-          overflow: 'hidden', // Hide overflow text
-          whiteSpace: 'nowrap', // Prevent text from wrapping 
-          // margin: '5px auto 0', // Center the text and provide spacing
-        }}
-        title={item} // Tooltip to show full text on hover
-      >
-        {item}
-      </p>
-      <Trash2 size={20}/>
-          </div>
-          
-        </div>))
-            )
-            :""} */}
             {values?.productDetails.length ? (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}> 
     {/* Flex container to display items in a row */}
@@ -604,8 +603,13 @@ export default function Quotation() {
           </Row>
           <Modal.Footer>
           <Button variant="primary"  type="submit" disabled={isSubmitting}>
-                Add job
+                Add Quoatation
               </Button>
+              {values?._id?
+          <Button variant="primary"  type="button" onClick={()=>handleSubmit2(values,{ resetForm, setSubmitting },true)}  disabled={isloading}>
+                Approve
+              </Button>
+              :""}
         </Modal.Footer>
         </Form>
       )}}
@@ -616,6 +620,14 @@ export default function Quotation() {
               </Button>
             </Modal.Footer> */}
           </Commonmodal>
+          <ConfirmationDialog
+        open={confirmationState}
+        onOpenChange={setConfirmationState}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this product ?"
+        onConfirm={handleDelete}
+        onCancel={setConfirmationState}
+      />
         </div>
       )
     </>

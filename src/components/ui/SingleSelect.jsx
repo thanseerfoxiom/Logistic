@@ -123,7 +123,6 @@ const SingleSelect = ({
   };
 
   const validOptions = Array.isArray(options) ? options : [];
-
   return (
     <div className={`d-flex flex-column align-items-start ${className}`}>
       {label && (
@@ -146,6 +145,7 @@ const SingleSelect = ({
           options={showAddNew ? [addNewOption, ...validOptions] : validOptions}
           placeholder={placeholder}
           defaultValue={props.value}
+        
           value={
             validOptions
               ? validOptions.find((option) => option?.value === field.value)

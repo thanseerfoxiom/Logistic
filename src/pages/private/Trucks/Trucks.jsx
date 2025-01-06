@@ -22,6 +22,42 @@ export default function Trucks() {
     // Cleanup function to clear the timer if the component unmounts or the dependency array changes
     return () => clearTimeout(timer);
   }, []);
+  const handleDelete=()=>{
+    try {
+      mutation.mutate({
+        method: "delete",
+        url: `${quotationapi}/${deleteId}`,
+        key:'quotation',
+      });
+    } catch (error) {
+      console.log(error)
+    }}
+      const handleSubmit = (values, actions) => {
+        // console.log("values...............................",values)
+        // return 
+        try {
+          const apiurl = values?.id? `${quotationapi}/${values.id}` : quotationapi;
+          mutation.mutate({
+              method: values?.id? "put":"post",
+              url: apiurl,
+              values: { ...values },
+              key: "quotation",
+              next: () => {
+                handleClose(); 
+                actions.resetForm()
+                actions.setSubmitting(false)
+                setdata(null)
+              },
+          },       { onError: (error) => {
+            actions.setSubmitting(false); 
+          },}
+        );
+        } catch (error) {
+          console.log(error)
+          actions.setSubmitting(false); 
+        }
+       
+      };
   return (
     <>
     {pageLoading ? (

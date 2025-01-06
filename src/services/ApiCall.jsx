@@ -2,9 +2,11 @@ import axios from "axios";
 import { BaseUrl } from "./BaseUrls";
 
 export const ApiCall = async (method, endPoint, data, params, is_formdata) => {
+  let token = localStorage.getItem("token")
+  // console.log("token...............",token)
   var headers = {
     "Content-Type": is_formdata ? "multipart/form-data" : "application/json",
-    Authorization: "Bearer " + localStorage.getItem("token"),
+    Authorization:token? "Bearer " + token:'',
     platform: "web",
   };
   var url = BaseUrl + endPoint;

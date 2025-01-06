@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-
+import places from "../json/places.json"
 export const ContextDatas = createContext();
 
 const Context = ({ children }) => {
@@ -7,6 +7,12 @@ const Context = ({ children }) => {
   const [mobileSide, setmobileSide] = useState(false);
   const [pageLoading, setpageLoading] = useState(true);
   const [user, setuser] = useState(localStorage.getItem("token"))
+  const optionPlaces = places?.map(item=>({
+    value:item.city,
+    label:item.city,
+    lat:item.latitude,
+    lon:item.longitude
+  }))
 
   return (
     <ContextDatas.Provider
@@ -16,7 +22,8 @@ const Context = ({ children }) => {
         urlPath,
         setUrlPath,
         pageLoading, setpageLoading,
-        user, setuser
+        user, setuser,
+        optionPlaces
       }}
     >
       {children}
