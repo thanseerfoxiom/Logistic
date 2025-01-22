@@ -37,11 +37,11 @@ export default function Quotation() {
   const [confirmationState,setConfirmationState]=useState(false)
   const {mutation} = useCustomMutation();
   const { data: quotdatalist} = useFetchData('quotation',fetchQuatation);
-  const { data: vehiclelist} = useFetchData('vehicle',fetchvehicle);
+  const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
   console.log("padataa",quotdatalist?.data?.docs)
   console.log("vehiclelist",vehiclelist?.data?.docs)
   const optionvehicles = vehiclelist?.data?.docs?.map(item=>({
-    value:item.id,
+    value:item._id,
     label:item.name,
   }))
   // useEffect(() => {
@@ -405,7 +405,7 @@ export default function Quotation() {
               </div>
             </div>
           </div>
-          <Commonmodal show={show} handleClose={handleClose} title={"Quoatation"}>
+          <Commonmodal size={"lg"} show={show} handleClose={handleClose} title={"Quoatation"}>
           <Formik
       initialValues={{
         // jobId: selectData?.jobId||"",
@@ -452,10 +452,9 @@ export default function Quotation() {
         <Form onSubmit={handleSubmit}>
           <Row>
             {/* <FormikField name="jobId" label="Job ID" placeholder="1323" disabled colWidth={12} /> */}
-            <FormikField name="name" label="Name" placeholder="company name" colWidth={12}/>
-            <FormikField name="contact" label="Contact" placeholder="contact number" colWidth={12} />
-          </Row>
-          <Row>
+            <FormikField name="name" label="Name" placeholder="company name" colWidth={6}/>
+            <FormikField name="contact" label="Contact" placeholder="contact number" colWidth={6} />
+          
             {/* <FormikField name="from" label="From" placeholder="from place" colWidth={6} />
             <FormikField name="to" label="To" placeholder="to place" colWidth={6} /> */}
             <SingleSelect
@@ -491,45 +490,19 @@ export default function Quotation() {
             // options={pricedataOption.filter(option => option.value !== 1) || []}
             variant="border"  
           />   
-          </Row>
-          <Row>
-            <FormikField name="distance" label="Distance" placeholder="distacnce " disabled colWidth={12} />
-          </Row>
-          <Row>
-            {/* <Form.Group className="mb-3" controlId="productDetails">
-              <Form.Label>Product Details</Form.Label>
-              <Form.Control
-                type="file"
-                name="productDetails"
-                onChange={(event) => handleImageUpload(event, setFieldValue)}
-              />
-              {productImagePreview && (
-                <div>
-                  <img
-                    className="mt-1"
-                    src={productImagePreview}
-                    alt="Product Preview"
-                    style={{ width: '110px', height: '110px', cursor: 'pointer' }}
-                  />
-                </div>
-              )}
-            </Form.Group> */}
+          
+            <FormikField name="distance" label="Distance" placeholder="distacnce " disabled colWidth={6} />
+          
             <SingleSelect
             name="vehicleType"
             label="Vehicle Type "
             placeholder="Select VehicleType"
             className="w-100"
             options={optionvehicles??[]}
-            onChange={(value)=>{
-              // setFieldValue("distance",calculatedistance(values?.fromlat,values?.fromlon,value.lat,value.lon,));
-              // calculatedistance(values?.fromlat,values?.fromlon,value?.lat,value.lon)
-            }
-            }
             colWidth={6} 
-            // options={pricedataOption.filter(option => option.value !== 1) || []}
             variant="border"  
           /> 
-            <FormikField name="productDetails" label="Product Details" type = 'file' colWidth={12} />
+            <FormikField name="productDetails" label="Product Details" type = 'file' imagetype = "array" colWidth={12} />
             {values?.productDetails.length ? (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}> 
     {/* Flex container to display items in a row */}
@@ -598,8 +571,8 @@ export default function Quotation() {
           <Row>
           </Row>
           <Row>
-            <FormikField name="quotePrice" label="Quote Price" type = 'number' placeholder="quote price" colWidth={12} />
-            <FormikField name="date" label="Date" type= 'date'  placeholder="13 Mar 2024"  colWidth={12}  />
+            <FormikField name="quotePrice" label="Quote Price" type = 'number' placeholder="quote price" colWidth={6} />
+            <FormikField name="date" label="Date" type= 'date'  placeholder="13 Mar 2024"  colWidth={6}  />
           </Row>
           <Modal.Footer>
           <Button variant="primary"  type="submit" disabled={isSubmitting}>

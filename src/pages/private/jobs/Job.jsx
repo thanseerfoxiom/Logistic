@@ -9,7 +9,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useCustomMutation } from '../../../services/useCustomMutation';
 import { useFetchData } from '../../../services/useQueryFetchData';
-import { fetchjob } from '../../../api';
+import { fetchjob, fetchvehicle } from '../../../api';
 import * as Yup from 'yup';
 import Commonmodal from '../../../components/modal/Commonmodal';
 import { Formik } from 'formik';
@@ -32,15 +32,20 @@ export default function Job() {
   const [confirmationState,setConfirmationState]=useState(false)
     const {mutation} = useCustomMutation();
     const { data: jobdatalist} = useFetchData('job',fetchjob);
+    const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
     // console.log("fetchjobfetchjobfetchjobfetchjob",jobdatalist?.data?.docs)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setpageLoading(false);
-    }, 1000); // 5000 milliseconds = 5 seconds
+//   useEffect(() => {
+//     const timer = setTimeout(() => {
+//       setpageLoading(false);
+//     }, 1000); // 5000 milliseconds = 5 seconds
 
-    // Cleanup function to clear the timer if the component unmounts or the dependency array changes
-    return () => clearTimeout(timer);
-}, []);
+//     // Cleanup function to clear the timer if the component unmounts or the dependency array changes
+//     return () => clearTimeout(timer);
+// }, []);
+const optionvehicles = vehiclelist?.data?.docs?.map(item=>({
+  value:item._id,
+  label:item.name,
+}))
 const validationSchema = Yup.object({
   name: Yup.string().required('Name is required'),
   contact: Yup.string().required('Contact is required'),
@@ -154,9 +159,9 @@ const columns = useMemo(() => [
         // console.log("values...............................",values)
         // return 
         try {
-          const apiurl = values?.id? `${quotationapi}/${values.id}` : quotationapi;
+          const apiurl = values?._id? `${quotationapi}/${values._id}` : quotationapi;
           mutation.mutate({
-              method: values?.id? "put":"post",
+              method: values?._id? "put":"post",
               url: apiurl,
               values: { ...values },
               key: "quotation",
@@ -179,9 +184,11 @@ const columns = useMemo(() => [
     console.log("sleecteddata",selectData)
   return (
     <>
-    {pageLoading ? (
-      <Loader/>
-    ) : (
+    {
+    // pageLoading ? (
+    //   <Loader/>
+    // ) :
+     (
       <div className={`contents  ${mobileSide ? "expanded" : ""}`}>
         <div className="demo2 mb-25 t-thead-bg">
           <div className="container-fluid">
@@ -234,7 +241,7 @@ const columns = useMemo(() => [
             </div>
           </div>
         </div>
-        <Commonmodal show={show} handleClose={handleClose} title={"Job Details"}>
+        <Commonmodal size={"lg"} show={show} handleClose={handleClose} title={"Job Details"}>
       <Formik
         initialValues={{
           name: selectData?.quotationId?.name || "",
@@ -250,6 +257,7 @@ const columns = useMemo(() => [
           vehicleType: selectData?.quotationId?.vehicleType || "",
           driver: selectData?.driver || "",
           status: selectData?.status || "",
+          ...(selectData?._id ? { _id: selectData._id } : {}),
         }}
         validationSchema={validationSchema}
         onSubmit={(values, actions) => {
@@ -412,13 +420,13 @@ const columns = useMemo(() => [
                     type="text"
                   />
                 </Col>
-                <Col md={6}>
+              
                 <SingleSelect
                     name="driver"
                     label="Driver"
                     placeholder="Select driver"
                     className="w-100"
-                    // options={optionVehicles || []}
+                    options={optionvehicles || []}
                     onChange={(value) => {
                       setFieldValue("driver", value.value);
                     }}
@@ -437,8 +445,8 @@ const columns = useMemo(() => [
                     <option value="driver3">Driver 3</option>
                     <option value="driver4">Driver 4</option>
                   </FormikField> */}
-                </Col>
-                <Col md={6}>
+                
+          
                 <SingleSelect
                     name="status"
                     label="status"
@@ -456,18 +464,7 @@ const columns = useMemo(() => [
                     colWidth={6}
                     variant="border"
                   />
-                  {/* <FormikField
-                    name="status"
-                    label="Status"
-                    as="select"
-                  >
-                    <option value="">Select Status</option>
-                    <option value="request-pending">Request Pending</option>
-                    <option value="driver-arrived">Driver Arrived</option>
-                    <option value="picked-up">Picked Up</option>
-                    <option value="delivered">Delivered</option>
-                  </FormikField> */}
-                </Col>
+                 
                 <Col md={6}>
                 {/* <FormikField name="productDetails" label="Product Details" type = 'file' colWidth={12} /> */}
                 <label>Product details</label>
@@ -497,7 +494,6 @@ const columns = useMemo(() => [
             marginBottom: '5px',
           }}
         />
-
         {/* Text underneath */}
         <p
           style={{
@@ -514,7 +510,6 @@ const columns = useMemo(() => [
         >
           {item}
         </p>
-
         {/* Delete Button */}
         {/* <Trash2   
           size={18}

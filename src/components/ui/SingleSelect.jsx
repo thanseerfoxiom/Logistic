@@ -2,6 +2,7 @@ import React from "react";
 import Select, { components } from "react-select";
 import { useField } from "formik";
 import { ChevronDown } from "lucide-react";
+import { Col } from "react-bootstrap";
 
 const CustomOption = (props) => {
   const { data } = props;
@@ -89,6 +90,7 @@ const SingleSelect = ({
   showAddNew,
   options = [],
   menuPortalTarget,
+  xs = 12,
   colWidth = 12,
   onChange,
   variant = "default",
@@ -124,7 +126,8 @@ const SingleSelect = ({
 
   const validOptions = Array.isArray(options) ? options : [];
   return (
-    <div className={`d-flex flex-column align-items-start ${className}`}>
+    <Col  xs={xs} md={colWidth}>
+    <div  className={`d-flex flex-column align-items-start ${className}`}>
       {label && (
         <label
           className={`mb-1 ${labelClasses[variant]}`}
@@ -173,6 +176,7 @@ const SingleSelect = ({
         )}
       </div>
     </div>
+    </Col>
   );
 };
 

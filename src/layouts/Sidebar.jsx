@@ -9,6 +9,7 @@ import {
   quotationPath,
   settingsPath,
   truckPath,
+  vehicletypePath,
 } from "../services/UrlPaths";
 import { Link, useNavigate } from "react-router-dom/dist";
 
@@ -68,7 +69,8 @@ function Sidebar() {
                 to={basePath + driversPath}
                 onClick={() => setUrlPath(basePath + driversPath)}
               >
-                <span className="nav-icon uil uil-car-sideview" />
+                {/* <span className="nav-icon uil uil-car-sideview" /> */}
+                <span className="nav-icon uil uil-streering" />
                 <span className="menu-text">Drivers</span>
                 {/* <span className="badge badge-info-10 menuItem rounded-pill">
               1.1.7
@@ -83,6 +85,18 @@ function Sidebar() {
               >
                 <span className="nav-icon uil uil-truck" />
                 <span className="menu-text">Trucks and Price</span>
+                {/* <span className="badge badge-info-10 menuItem rounded-pill">
+              1.1.7
+            </span> */}
+              </Link>
+            </li>
+            <li className={urlPath.includes(vehicletypePath) ? "active" : ""}>
+              <Link
+                to={basePath + vehicletypePath}
+                onClick={() => setUrlPath(basePath + vehicletypePath)}
+              >
+                <span className="nav-icon uil uil-bus" />
+                <span className="menu-text">Vehicle Type</span>
                 {/* <span className="badge badge-info-10 menuItem rounded-pill">
               1.1.7
             </span> */}

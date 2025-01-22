@@ -18,6 +18,7 @@ import {
   quotationPath,
   settingsPath,
   truckPath,
+  vehicletypePath,
 } from "./services/UrlPaths";
 
 import SettingsManagement from "./pages/private/Settings/SettingsManagement";
@@ -28,6 +29,7 @@ import Drivers from "./pages/private/drivers/Drivers";
 import Trucks from "./pages/private/Trucks/Trucks";
 import Details from "./pages/private/finance/Details";
 import PrivateRoute from "./utils/PrivateRoute";
+import VehicleType from "./pages/private/VehicleType/vehicleType";
 
 
 function App() {
@@ -68,6 +70,10 @@ function App() {
           <Route
             path={basePath + detailsPath }
             element={<Details/>}
+          />
+          <Route
+            path={basePath + vehicletypePath }
+            element={<VehicleType/>}
           />
         </Route>
         <Route path="*" element={<PageNotFound />} />

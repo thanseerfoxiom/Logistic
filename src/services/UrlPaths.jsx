@@ -1,11 +1,6 @@
 export const loginPath = "login";
 export const basePath = "/";
-// export const managerPath = "managers";
-// export const ordersPath = "orders";
-// export const pricingPlanPath = "pricing-plan";
-// export const specializationPath = "specialization";
-// export const doctorsPath = "doctor";
-// export const paymentsPath = "payments";
+
 export const settingsPath = "settings";
 export const notificationPath = "notification";
 export const quotationPath = "quotation"
@@ -14,3 +9,4 @@ export const financePath = "finance"
 export const truckPath = "trucks"
 export const driversPath = "drivers"
 export const detailsPath = "details"
+export const vehicletypePath = "vehicletype"

@@ -37,3 +37,9 @@ export const useCustomMutation = () => {
  
   return { mutation };
 };
+
+export const useGetFetchQuery = (key) => {
+  const queryClient = useQueryClient();
+
+  return queryClient.getQueryData(key);
+}
