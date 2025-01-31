@@ -35,7 +35,8 @@ export default function Job() {
     const { data: jobdatalist} = useFetchData('job',fetchjob);
     // const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
     const { data: driverlist} = useFetchData('driver',fetchDriver);
-    console.log("fetchjobfetchjobfetchjobfetchjob",driverlist?.data?.docs)
+    console.log("fetchjobfetchjobfetchjobfetchjob",jobdatalist?.data?.docs)
+    console.log("selectedDriver",selectData)
 //   useEffect(() => {
 //     const timer = setTimeout(() => {
 //       setpageLoading(false);
@@ -257,7 +258,7 @@ const columns = useMemo(() => [
           productDetails: selectData?.quotationId?.productDetails || [],
           deliveryDocuments:selectData?.quotationId?.deliveryDocuments|| "",
           vehicleType: selectData?.quotationId?.vehicleType?._id || "",
-          driver: selectData?.driver?.driverId|| "",
+          driver: selectData?.driver?._id|| "",
           status: selectData?.status || "",
           ...(selectData?._id ? { _id: selectData._id } : {}),
         }}

@@ -38,7 +38,7 @@ export default function Drivers() {
   const [deleteId,setDeleteId]=useState(null)
   const [confirmationState,setConfirmationState]=useState(false)
   const { data: driverlist} = useFetchData('driver',fetchDriver);
-  console.log("driverdta",driverlist)
+  
   const {data:trucklist} = useFetchData("truckS",fetchTrucks)
     const optiontrucks = trucklist?.data?.docs?.map(item=>({
       value:item._id,

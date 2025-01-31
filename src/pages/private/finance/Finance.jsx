@@ -9,7 +9,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useCustomMutation } from '../../../services/useCustomMutation';
 import { useFetchData } from '../../../services/useQueryFetchData';
-import { fetchFinance, fetchvehicle } from '../../../api';
+import { fetchDriver, fetchFinance, fetchvehicle } from '../../../api';
 import * as Yup from 'yup';
 import Commonmodal from '../../../components/modal/Commonmodal';
 import { Formik } from 'formik';
@@ -33,12 +33,13 @@ export default function Finance() {
   const [confirmationState,setConfirmationState]=useState(false)
     const {mutation} = useCustomMutation();
     const { data: financelist} = useFetchData('finance',fetchFinance);
-    const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
+     const { data: driverlist} = useFetchData('driver',fetchDriver);
+
     console.log("financelistfinancelistfinancelist",financelist?.data?.docs)
 
-const optionvehicles = vehiclelist?.data?.docs?.map(item=>({
+const optionvehicles = driverlist?.data?.docs?.map(item=>({
   value:item._id,
-  label:item.name,
+  label:item.driverId,
 }))
 const validationSchema = Yup.object({
   name: Yup.string().required('Name is required'),
@@ -56,6 +57,13 @@ const validationSchema = Yup.object({
 
 
 const kendoColumns = [
+  { title: "JobID", field: "job_id.job_id",width: "120px",
+    template: "#= typeof job_id !== 'undefined' ? job_id.job_id : '' #",
+    filterable: {
+    multi: true, // Enable multi‐checkbox
+    search: true // Optional: show a search box in the dropdown
+    // dataSource: [...] // (Optional) supply custom items if needed
+  } },
   { title: "Name", field: "quotationId.name",width: "150px",
     template: "#= quotationId?.name || `` #",
     filterable: {
@@ -83,8 +91,8 @@ const kendoColumns = [
   },
   {
     title: "Vehicle Type",
-    field: "quotationId.vehicleType.name",
-    template: "#= quotationId?.vehicleType?.name || '' #", // Handle null/undefined
+    field: "quotationId.vehicleType.truck_id",
+    template: "#= quotationId?.vehicleType?.truck_id || '' #", // Handle null/undefined
     width: "150px",
     filterable: { multi: true }
   },
@@ -351,8 +359,9 @@ const columns = useMemo(() => [
           date: selectData?.quotationId?.date? formatDate(selectData?.quotationId?.date):"" || formatDate(new Date().toISOString()),
           productDetails: selectData?.quotationId?.productDetails || [],
           deliveryDocuments:selectData?.quotationId?.deliveryDocuments|| "",
-          vehicleType: selectData?.quotationId?.vehicleType || "",
-          driver: selectData?.driver || "",
+          vehicleType: selectData?.quotationId?.vehicleType?.truck_id || "",
+          driver: selectData?.job_id?.driver || "",
+          jobstatus: selectData?.job_id?.status || "",
           paymentStatus: selectData?.paymentStatus || "",
           advanceAmount: selectData?.advanceAmount || "",
           pendingAmount: selectData?.pendingAmount || "",
@@ -472,10 +481,11 @@ const columns = useMemo(() => [
                     type="text"
                   />
                 </Col>
-              
+                
                 <SingleSelect
                     name="driver"
                     label="Driver"
+                    disabled
                     placeholder="Select driver"
                     className="w-100"
                     options={optionvehicles || []}

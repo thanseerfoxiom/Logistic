@@ -93,6 +93,7 @@ const SingleSelect = ({
   xs = 12,
   colWidth = 12,
   onChange,
+  disabled="false",
   variant = "default",
   ...props
 }) => {
@@ -148,7 +149,7 @@ const SingleSelect = ({
           options={showAddNew ? [addNewOption, ...validOptions] : validOptions}
           placeholder={placeholder}
           defaultValue={props.value}
-        
+          isDisabled={disabled.toString()}
           value={
             validOptions
               ? validOptions.find((option) => option?.value === field.value)
