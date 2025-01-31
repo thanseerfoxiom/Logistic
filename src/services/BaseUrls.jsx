@@ -1,4 +1,4 @@
-export const BaseUrl = "http://192.168.1.95:3010/api/"
+export const BaseUrl = "http://192.168.1.68:3010/api/"
 
 export const uploadapi = "upload"
 export const userloginapi = "user/login"

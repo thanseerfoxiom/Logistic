@@ -345,13 +345,16 @@ const [pagination,setPagination] =useState({
             </div> */}
            <div style={{ 
   display: "flex",
-  alignItems: "center",  // vertically center items
+  alignItems: "center",
+  flexWrap: "wrap",  // vertically center items
   // gap: "20px"            // space between items
 }}>
   <FormikField
     name="image"
     label="Image"
     type="file"
+    xs={4}
+    colWidth={6}
     onChange={(event) => {
       const file = event.currentTarget.files[0];
       if (file) {

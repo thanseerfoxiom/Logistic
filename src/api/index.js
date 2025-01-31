@@ -1,5 +1,5 @@
 import { ApiCall } from "../services/ApiCall"
-import { jobapi, quotationapi, truckapi, usersapi, vehicleTypeapi } from "../services/BaseUrls"
+import { financeapi, jobapi, quotationapi, truckapi, usersapi, vehicleTypeapi } from "../services/BaseUrls"
 
 export const fetchQuatation = async(page,limit)=> {
     const response = await ApiCall("GET",quotationapi,null,{page,limit});
@@ -39,6 +39,15 @@ export const fetchDriver = async(page,limit)=> {
 }
 export const fetchTrucks = async(params)=> {
     const response = await ApiCall("GET",truckapi,null,params);
+    if(response?.status){
+        return response.message
+         }
+        else {
+        return []
+         }
+}
+export const fetchFinance = async(params)=> {
+    const response = await ApiCall("GET",financeapi,null,params);
     if(response?.status){
         return response.message
          }

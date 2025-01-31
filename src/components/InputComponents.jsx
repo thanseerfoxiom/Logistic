@@ -3,15 +3,37 @@ import { Form, Col } from 'react-bootstrap';
 import { useField, useFormikContext } from 'formik';
 import { BaseUrl, uploadapi } from '../services/BaseUrls';
 import { FileUp } from 'lucide-react';
+import { useCustomMutation } from '../services/useCustomMutation';
 const FormikField = ({ label, name, type, placeholder, xs = 12, colWidth = 12, disabled = false, uploadUrl,imagetype = "string" }) => {
   const [field, meta] = useField(name); // Hooks into Formik's context
   const { setFieldValue ,values} = useFormikContext();
+  const {mutation} = useCustomMutation();
   const fileInputRef = useRef(null); // Reference to the hidden file input
   const [showPassword, setShowPassword] = useState(false);
   const handleImageClick = () => {
     fileInputRef.current.click(); // Trigger the hidden file input
   };
-
+  const handleDeleteImage = async (previmage)=>{
+    try {
+      mutation.mutate({
+              method:"post",
+              url: `${uploadapi}`,
+              values:{previousFiles:previmage},
+            },
+            {
+              onSuccess: () => {
+                // console.log("image delected successfully ")
+                return
+              },
+              onError: (error) => {
+                console.log(error)
+              },
+            }
+          )
+    } catch (error) {
+      
+    }
+  }
   const handleImageChange = async (e) => {
     const file = e.target.files; // Get the uploaded file
     if (file) {
@@ -20,7 +42,11 @@ const FormikField = ({ label, name, type, placeholder, xs = 12, colWidth = 12, d
       // console.log("filefilefilefile",file[0])
       const formData = new FormData();
       formData.append('files', file[0]);
-
+      console.log("values[name]values[name]",values[name])
+      if(values[name] && imagetype != "array"){
+        
+        handleDeleteImage(values[name])
+      }
       try {
         const response = await fetch(BaseUrl+uploadapi, {
           method: 'POST',

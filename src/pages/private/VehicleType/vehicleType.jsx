@@ -55,6 +55,7 @@ const [pagination,setPagination] =useState({
   const columns = useMemo(() => [
     {
       header: "Sl.no",
+      size:120,
       accessorKey: "",
       cell: (info) => info.row.index + 1,
     },
@@ -66,6 +67,7 @@ const [pagination,setPagination] =useState({
      
       {
         header: 'Action',
+        size:120,
         // accessorKey: '',
       //   cell:info=><ul className='text-align-center d-flex'>
       //   <li>

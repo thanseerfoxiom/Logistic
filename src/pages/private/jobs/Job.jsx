@@ -9,7 +9,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useCustomMutation } from '../../../services/useCustomMutation';
 import { useFetchData } from '../../../services/useQueryFetchData';
-import { fetchjob, fetchvehicle } from '../../../api';
+import { fetchDriver, fetchjob, fetchvehicle } from '../../../api';
 import * as Yup from 'yup';
 import Commonmodal from '../../../components/modal/Commonmodal';
 import { Formik } from 'formik';
@@ -18,6 +18,7 @@ import FormikField from '../../../components/InputComponents';
 import SingleSelect from '../../../components/ui/SingleSelect';
 import { Trash2 } from 'lucide-react';
 import Table from '../../../components/Table';
+import { jobapi } from '../../../services/BaseUrls';
 export default function Job() {
     const [pageLoading, setpageLoading] = useState(true);
   const { mobileSide,optionPlaces } = useContext(ContextDatas);
@@ -32,8 +33,9 @@ export default function Job() {
   const [confirmationState,setConfirmationState]=useState(false)
     const {mutation} = useCustomMutation();
     const { data: jobdatalist} = useFetchData('job',fetchjob);
-    const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
-    // console.log("fetchjobfetchjobfetchjobfetchjob",jobdatalist?.data?.docs)
+    // const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
+    const { data: driverlist} = useFetchData('driver',fetchDriver);
+    console.log("fetchjobfetchjobfetchjobfetchjob",driverlist?.data?.docs)
 //   useEffect(() => {
 //     const timer = setTimeout(() => {
 //       setpageLoading(false);
@@ -42,9 +44,9 @@ export default function Job() {
 //     // Cleanup function to clear the timer if the component unmounts or the dependency array changes
 //     return () => clearTimeout(timer);
 // }, []);
-const optionvehicles = vehiclelist?.data?.docs?.map(item=>({
+const optionvehicles = driverlist?.data?.docs?.map(item=>({
   value:item._id,
-  label:item.name,
+  label:item.driverId,
 }))
 const validationSchema = Yup.object({
   name: Yup.string().required('Name is required'),
@@ -95,9 +97,9 @@ const columns = useMemo(() => [
   },
   {
     header: 'Vehicle Type',
-    accessorKey: 'vehicleType',
+    accessorKey: 'quotationId?.vehicleType?.truck_id',
     cell:({row})=>(
-      row.original?.quotationId?.vehicleType?.name
+      row.original?.quotationId?.vehicleType?.truck_id
     )
   },
   {
@@ -159,7 +161,7 @@ const columns = useMemo(() => [
         // console.log("values...............................",values)
         // return 
         try {
-          const apiurl = values?._id? `${quotationapi}/${values._id}` : quotationapi;
+          const apiurl = values?._id? `${jobapi}/${values._id}` : jobapi;
           mutation.mutate({
               method: values?._id? "put":"post",
               url: apiurl,
@@ -254,8 +256,8 @@ const columns = useMemo(() => [
           date: selectData?.quotationId?.date? formatDate(selectData?.quotationId?.date):"" || formatDate(new Date().toISOString()),
           productDetails: selectData?.quotationId?.productDetails || [],
           deliveryDocuments:selectData?.quotationId?.deliveryDocuments|| "",
-          vehicleType: selectData?.quotationId?.vehicleType || "",
-          driver: selectData?.driver || "",
+          vehicleType: selectData?.quotationId?.vehicleType?._id || "",
+          driver: selectData?.driver?.driverId|| "",
           status: selectData?.status || "",
           ...(selectData?._id ? { _id: selectData._id } : {}),
         }}
@@ -453,9 +455,9 @@ const columns = useMemo(() => [
                     placeholder="Select status"
                     className="w-100"
                     options={[
-                      {value:"request-pending",label:"Request pending"},
-                      {value:"driver-arrived",label:"Driver Arrived"},
-                      {value:"picked-up",label:"Picked up"},
+                      {value:"request pending",label:"Request pending"},
+                      {value:"driver arrived",label:"Driver Arrived"},
+                      {value:"picked up",label:"Picked up"},
                       {value:"delivered",label:"Delivered"},
                     ] || []}
                     onChange={(value) => {

@@ -29,9 +29,9 @@ export default function Table({ data, columns, pagination, setPagination }) {
             width: '100%',
           }}
         >
-          <thead>
+          <thead className=' text-uppercase'>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              <tr key={headerGroup.id} >
                 {headerGroup.headers.map((header) => {
                   // Use a 'size' property on the column, or default to auto
                   // console.log("header.column.columnDef.size",header.column.columnDef.size)
@@ -43,7 +43,13 @@ export default function Table({ data, columns, pagination, setPagination }) {
                       style={{
                         // textAlign: 'center',
                         width: `${columnSize}px`, // Must set <th> width for fixed layout
+                        backgroundColor:"#848c93",
+                        color:"white",
+                        borderStyle: "solid",
+                        borderWidth: "0 0 1px 1px",
+                     
                       }}
+                      className=" text-uppercase"
                     >
                       {flexRender(
                         header.column.columnDef.header,

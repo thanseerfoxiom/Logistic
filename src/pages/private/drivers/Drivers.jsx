@@ -12,7 +12,7 @@ import { Row } from "react-bootstrap";
 import FormikField from "../../../components/InputComponents.jsx";
 // --- Custom SingleSelect component ---
 import SingleSelect from "../../../components/ui/SingleSelect.jsx";
-import { fetchDriver, fetchvehicle } from "../../../api/index.js";
+import { fetchDriver, fetchTrucks, fetchvehicle } from "../../../api/index.js";
 import { useFetchData } from "../../../services/useQueryFetchData.js";
 import { useCustomMutation, useGetFetchQuery } from "../../../services/useCustomMutation.js";
 import { usersapi } from "../../../services/BaseUrls.jsx";
@@ -25,7 +25,7 @@ import ConfirmationDialog from "../../../components/modal/ConfirmationDialog.jsx
 export default function Drivers() {
   const {mutation} = useCustomMutation();
   const [pageLoading, setPageLoading] = useState(false);
-  const { mobileSide } = useContext(ContextDatas);
+  const { mobileSide,optionPlaces } = useContext(ContextDatas);
   const [pagination,setPagination] =useState({
         pageIndex:0,
         pageSize:10
@@ -39,23 +39,23 @@ export default function Drivers() {
   const [confirmationState,setConfirmationState]=useState(false)
   const { data: driverlist} = useFetchData('driver',fetchDriver);
   console.log("driverdta",driverlist)
-  const {data : vehiclelist} = useFetchData('vehicletype',fetchvehicle)
-  // Holds data for the currently selected driver (for editing)
-  const optionvehicles = vehiclelist?.data?.docs?.map(item=>({
-    value:item._id,
-    label:item.name,
-  }))
+  const {data:trucklist} = useFetchData("truckS",fetchTrucks)
+    const optiontrucks = trucklist?.data?.docs?.map(item=>({
+      value:item._id,
+      label:item.truck_id
+      ,
+    }))
   const [selectedDriver, setSelectedDriver] = useState(null);
   
   // Dummy array to display in table. Replace with data from your API.
 
   const columns = useMemo(() => [
-    // {
-    //   header: "Driver ID",
-    //   accessorKey: "id",
-    //   size: 110,
-    //   cell: ({ row }) => <strong>{row.original.id}</strong>,
-    // },
+    {
+      header: "Driver ID",
+      accessorKey: "driverId",
+      // size: 110,
+      // cell: ({ row }) => <strong>{row.original.id}</strong>,
+    },
     {
       header: "Name",
       accessorKey: "name",
@@ -82,8 +82,8 @@ export default function Drivers() {
 
     },
     {
-      header: "Vehicle Type",
-      accessorKey: "vehicleType",
+      header: "Truck",
+      accessorKey: "vehicleType.truck_id",
   
     },
     {
@@ -168,7 +168,6 @@ export default function Drivers() {
     try {
       values.role = "driver"
       const apiurl = values?._id? `${usersapi}/${values._id}` : usersapi;
-      console.log("valuessssss",values)
       mutation.mutate({
           method: values?._id? "put":"post",
           url: apiurl,
@@ -264,6 +263,7 @@ export default function Drivers() {
         : "", // Format as YYYY-MM-DD
       truckPermission: selectedDriver?.truckPermission || "",
       // role: selectedDriver?.role || "driver", // Default role is driver
+      ...(selectedDriver?._id ? { _id: selectedDriver._id } : {}),
     }}
     validate={(values) => {
       const errors = {};
@@ -293,7 +293,7 @@ export default function Drivers() {
       if (!values.vehicleType) {
         errors.vehicleType = "Vehicle Type is required";
       }
-      console.log("errrrrrrrrrrrrrrrrrrrrrrr",errors)
+      console.log(errors)
       return errors;
     }}
     onSubmit={(values, { setSubmitting }) => {
@@ -315,15 +315,15 @@ export default function Drivers() {
     
           <Row>
             {/* Driver ID (optional, read-only) */}
-            {selectedDriver && (
+         
               <FormikField
                 name="driverId"
                 label="Driver ID"
-                placeholder="Driver ID"
+                placeholder="Driver ID..."
                 colWidth={6}
-                disabled
+                
               />
-            )}
+           
           
             {/* Driver Name */}
             <FormikField
@@ -358,23 +358,34 @@ export default function Drivers() {
             <FormikField
               name="mobile"
               label="Mobile"
-              placeholder="Mobile number"
+              placeholder="Mobile number..."
               colWidth={6}
             />
          
             {/* Location */}
-            <FormikField
+            {/* <FormikField
               name="location"
               label="Location"
               placeholder="City / State"
               colWidth={6}
-            />
+            /> */}
+             <SingleSelect
+            name="location"
+            label="Location"
+            placeholder="Select Location..."
+            className="w-100"
+            options={optionPlaces??[]}
+            colWidth={6}  
+            
+            // options={pricedataOption.filter(option => option.value !== 1) || []}
+            variant="border" 
+          /> 
           
             {/* Vehicle No */}
             <FormikField
               name="vehicleNo"
               label="Vehicle No"
-              placeholder="ABC-1234"
+              placeholder=" Vehicle No..."
               colWidth={6}
             />
           
@@ -382,7 +393,7 @@ export default function Drivers() {
             <FormikField
               name="registerNo"
               label="Register No"
-              placeholder="12540444584"
+              placeholder="Register No..."
               colWidth={6}
             />
           </Row>
@@ -442,6 +453,7 @@ export default function Drivers() {
             </div> */}
              <div style={{ 
   display: "flex",
+  flexWrap: "wrap",
   alignItems: "center",  // vertically center items
   // gap: "20px"            // space between items
 }}>
@@ -449,6 +461,8 @@ export default function Drivers() {
     name="truckPermission"
     label="Truck Permission"
     type="file"
+    xs={4}
+    colWidth={3}
     onChange={(event) => {
       const file = event.currentTarget.files[0];
       if (file) {
@@ -501,10 +515,10 @@ export default function Drivers() {
             {/* Vehicle Type */}
             <SingleSelect
               name="vehicleType"
-              label="Vehicle Type"
-              placeholder="Select vehicle type"
+              label="Truck Type"
+              placeholder="Select Truck type..."
               className="w-100"
-              options={optionvehicles}
+              options={optiontrucks}
               
               onChange={(selected) => {
                 setFieldValue("vehicleType", selected.value);

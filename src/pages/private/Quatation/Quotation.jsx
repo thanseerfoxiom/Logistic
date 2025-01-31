@@ -11,7 +11,7 @@ import Table from '../../../components/Table';
 import FormikField from '../../../components/InputComponents.jsx';
 import { Formik } from 'formik';
 import { Form, Button, Row } from 'react-bootstrap';
-import { fetchQuatation, fetchvehicle } from '../../../api/index.js';
+import { fetchQuatation, fetchTrucks, fetchvehicle } from '../../../api/index.js';
 import { useCustomMutation } from '../../../services/useCustomMutation.js';
 import Commonmodal from '../../../components/modal/Commonmodal.jsx';
 import SingleSelect from '../../../components/ui/SingleSelect.jsx';
@@ -37,12 +37,11 @@ export default function Quotation() {
   const [confirmationState,setConfirmationState]=useState(false)
   const {mutation} = useCustomMutation();
   const { data: quotdatalist} = useFetchData('quotation',fetchQuatation);
-  const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
-  console.log("padataa",quotdatalist?.data?.docs)
-  console.log("vehiclelist",vehiclelist?.data?.docs)
-  const optionvehicles = vehiclelist?.data?.docs?.map(item=>({
+  const {data:trucklist} = useFetchData("truckS",fetchTrucks)
+  const optiontrucks = trucklist?.data?.docs?.map(item=>({
     value:item._id,
-    label:item.name,
+    label:item.truck_id
+    ,
   }))
   // useEffect(() => {
   //   const timer = setTimeout(() => {
@@ -305,8 +304,8 @@ export default function Quotation() {
       size:110,
     },
     {
-      header: 'Vehicle Type',
-      accessorKey: 'vehicleType',
+      header: 'Truck Type',
+      accessorKey: 'vehicleType.truck_id',
     },
     {
       header: 'Price',
@@ -353,11 +352,12 @@ export default function Quotation() {
   return (
     <>
        (
+        
         <div className={`contents ${mobileSide ? 'expanded' : ''}`}>
           <div className="demo2 mb-25 t-thead-bg">
             <div className="container-fluid">
-              <div className="row mt-50">
-                <div className="col-xxl-12 mb-25">
+              <div className="row mt-20">
+                <div className="col-xxl-8 mb-25">
                   <div className="card border-0 px-25">
                     <div className="card-header px-0 border-0">
                       <h6>Quotation</h6>
@@ -415,8 +415,9 @@ export default function Quotation() {
         to: selectData?.to||"",
         distance: selectData?.distance||"",
         quotePrice: selectData?.quotePrice||"",
-        date: selectData?.date|| formatDate(new Date().toISOString()),
-        productDetails: selectData?.productDetails||"",
+        vehicleType:selectData?.vehicleType?._id||"",
+        date: selectData?.date?formatDate(selectData?.date): formatDate(new Date().toISOString()),
+        productDetails: selectData?.productDetails?.length?selectData?.productDetails:[]||[],
         ...(selectData?._id ? { _id: selectData._id } : {}),
         
 
@@ -495,10 +496,10 @@ export default function Quotation() {
           
             <SingleSelect
             name="vehicleType"
-            label="Vehicle Type "
-            placeholder="Select VehicleType"
+            label="Truck Type "
+            placeholder="Select Truck Type"
             className="w-100"
-            options={optionvehicles??[]}
+            options={optiontrucks??[]}
             colWidth={6} 
             variant="border"  
           /> 
