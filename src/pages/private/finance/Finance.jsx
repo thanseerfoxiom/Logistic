@@ -62,15 +62,19 @@ const kendoColumns = [
     template: "#= typeof job_id !== 'undefined' ? job_id.job_id : '' #",
     filterable: {
     multi: true, // Enable multi‐checkbox
-    search: true // Optional: show a search box in the dropdown
+    search: true, // Optional: show a search box in the dropdown
+    
     // dataSource: [...] // (Optional) supply custom items if needed
-  } },
+  } ,
+  aggregates: ["count"],groupFooterTemplate: "Count: #=count#" 
+},
   { title: "Name", field: "quotationId.name",width: "150px",
     template: "#= quotationId?.name || `` #",
     filterable: {
     multi: true, // Enable multi‐checkbox
-    search: true // Optional: show a search box in the dropdown
+    search: true, // Optional: show a search box in the dropdown
     // dataSource: [...] // (Optional) supply custom items if needed
+    
   } },
   { title: "From", field: "quotationId.from",width: "150px",
     template: "#= quotationId?.from || `` #",
@@ -102,7 +106,8 @@ const kendoColumns = [
     field: "quotationId.quotePrice",
     template: "#= quotationId?.quotePrice || '' #", // Handle null/undefined
     width: "125px",
-    filterable: {multi: true,}
+    filterable: {multi: true,},
+    aggregates: ["sum"], groupHeaderColumnTemplate: "total: #=sum#" 
   },
   {
     title: "Date",
@@ -148,6 +153,8 @@ const kendoColumns = [
     field: "actions",
     template: "<div class='actions-cell'></div>",
     width: "100px",
+    filterable:false,
+    groupable: false,
     actionButtons: [
       {
         iconClass: "info-icon",
@@ -313,7 +320,7 @@ const columns = useMemo(() => [
         <div className="demo2 mb-25 t-thead-bg">
           <div className="container-fluid">
             <div className="row mt-50">
-              <div className="col-xxl-8 mb-25">
+              <div className="col-md-12 col-12 mb-25">
                 <div className="card border-0 px-25">
                   <div className="card-header px-0 border-0">
                     <h6>Finance</h6>
