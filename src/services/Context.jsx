@@ -6,6 +6,7 @@ const Context = ({ children }) => {
   const [urlPath, setUrlPath] = useState(window.location.pathname ?? "/");
   const [mobileSide, setmobileSide] = useState(false);
   const [pageLoading, setpageLoading] = useState(true);
+  const [search, setsearch] = useState("");
   const [user, setuser] = useState(localStorage.getItem("token"))
   const optionPlaces = places?.map(item=>({
     value:item.city,
@@ -23,7 +24,8 @@ const Context = ({ children }) => {
         setUrlPath,
         pageLoading, setpageLoading,
         user, setuser,
-        optionPlaces
+        optionPlaces,
+        search,setsearch
       }}
     >
       {children}

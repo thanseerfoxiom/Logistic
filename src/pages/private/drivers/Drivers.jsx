@@ -25,19 +25,24 @@ import ConfirmationDialog from "../../../components/modal/ConfirmationDialog.jsx
 export default function Drivers() {
   const {mutation} = useCustomMutation();
   const [pageLoading, setPageLoading] = useState(false);
-  const { mobileSide,optionPlaces } = useContext(ContextDatas);
-  const [pagination,setPagination] =useState({
-        pageIndex:0,
-        pageSize:10
-      })
-
+  const { mobileSide,optionPlaces,search } = useContext(ContextDatas);
+  const [params,setparams] = useState({
+    page:1,
+    limit:10
+  })
+  useEffect(() => {
+    setparams((prev) => ({
+      ...prev,
+      query: search,
+    }));
+  }, [search])
   // For controlling the Modal
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [deleteId,setDeleteId]=useState(null)
   const [confirmationState,setConfirmationState]=useState(false)
-  const { data: driverlist} = useFetchData('driver',fetchDriver);
+  const { data: driverlist} = useFetchData('driver',fetchDriver,params);
   
   const {data:trucklist} = useFetchData("truckS",fetchTrucks)
     const optiontrucks = trucklist?.data?.docs?.map(item=>({
@@ -107,15 +112,15 @@ export default function Drivers() {
     {
       header: "Action",
       cell: ({ row }) => (
-        <ul className="text-align-center d-flex">
-          <li>
-            <a href="#" className="view m-3"onClick={() => {
+        <ul className="text-align-center ">
+          <li className="d-flex gap-3">
+            <a href="#" className="view "onClick={() => {
                 handleShow(); 
                 handleEditDriver(row.original);
               }} >
                 <Pencil className="wh-20 flex-shrink-0 cursor-pointer" />
               </a>
-          <a href="#" className="view" onClick={()=>handleDeleteConfirmation(row?.original?._id)}>
+          <a href="#" className="view " onClick={()=>handleDeleteConfirmation(row?.original?._id)}>
                 <Trash2 className="wh-20 flex-shrink-0 cursor-pointer" />
               </a>
            
@@ -235,7 +240,14 @@ export default function Drivers() {
                           role="tabpanel"
                           aria-labelledby="t_selling-today222-tab"
                         >
-                           <Table data={driverlist?.data?.docs??[]} columns={columns} pagination={pagination} />
+                           <Table data={driverlist?.data?.docs??[]} columns={columns} setParams={setparams}
+                           pagination={{
+                            page: params.page,
+                            limit: params.limit,
+                            totalPages: driverlist?.data?.totalDocs,
+                            hasNext: driverlist?.data?.hasNextPage,
+                            hasPrevious: driverlist?.data?.hasPreviousPage,
+                          }}/>
                         </div>
                       </div>
                     </div>

@@ -21,30 +21,27 @@ import Table from '../../../components/Table';
 import { jobapi } from '../../../services/BaseUrls';
 export default function Job() {
     const [pageLoading, setpageLoading] = useState(true);
-  const { mobileSide,optionPlaces } = useContext(ContextDatas);
+  const { mobileSide,optionPlaces,search } = useContext(ContextDatas);
   const [show, setShow] = useState(false);
   const [selectData,setselectData] =useState('')
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const [pagination,setPagination] =useState({
-      pageIndex:0,
-      pageSize:10
-    })
+  const [params,setparams] = useState({
+    page:1,
+    limit:10
+  })
+  
   const [confirmationState,setConfirmationState]=useState(false)
     const {mutation} = useCustomMutation();
-    const { data: jobdatalist} = useFetchData('job',fetchjob);
+    const { data: jobdatalist} = useFetchData('job',fetchjob,params);
     // const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
     const { data: driverlist} = useFetchData('driver',fetchDriver);
-    console.log("fetchjobfetchjobfetchjobfetchjob",jobdatalist?.data?.docs)
-    console.log("selectedDriver",selectData)
-//   useEffect(() => {
-//     const timer = setTimeout(() => {
-//       setpageLoading(false);
-//     }, 1000); // 5000 milliseconds = 5 seconds
-
-//     // Cleanup function to clear the timer if the component unmounts or the dependency array changes
-//     return () => clearTimeout(timer);
-// }, []);
+    useEffect(() => {
+      setparams((prev) => ({
+        ...prev,
+        query: search,
+      }));
+    }, [search])
 const optionvehicles = driverlist?.data?.docs?.map(item=>({
   value:item._id,
   label:item.driverId,
@@ -110,6 +107,12 @@ const columns = useMemo(() => [
     cell:({row})=>(
       row.original?.quotationId?.quotePrice
     )
+  },
+  {
+    header: 'Job status',
+    accessorKey: 'status',
+    size:110,
+    
   },
   {
     header: 'Date',
@@ -232,7 +235,14 @@ const columns = useMemo(() => [
                                             role="tabpanel"
                                             aria-labelledby="t_selling-today222-tab"
                                           >
-                                            <Table data={jobdatalist?.data?.docs??[]} columns={columns} pagination={pagination} 
+                                            <Table data={jobdatalist?.data?.docs??[]} columns={columns} setParams={setparams}
+                           pagination={{
+                            page: params.page,
+                            limit: params.limit,
+                            totalPages: jobdatalist?.data?.totalDocs,
+                            hasNext: jobdatalist?.data?.hasNextPage,
+                            hasPrevious: jobdatalist?.data?.hasPreviousPage,
+                          }}
                                             // setPagination={setPagination}
                                             />
                                             

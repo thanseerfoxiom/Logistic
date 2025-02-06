@@ -19,6 +19,7 @@ import SingleSelect from '../../../components/ui/SingleSelect';
 import { Trash2 } from 'lucide-react';
 import Table from '../../../components/Table';
 import KendoTable from '../../../components/KendoTable';
+import { financeapi } from '../../../services/BaseUrls';
 export default function Finance() {
     const [pageLoading, setpageLoading] = useState(true);
   const { mobileSide,optionPlaces } = useContext(ContextDatas);
@@ -42,17 +43,17 @@ const optionvehicles = driverlist?.data?.docs?.map(item=>({
   label:item.driverId,
 }))
 const validationSchema = Yup.object({
-  name: Yup.string().required('Name is required'),
-  contact: Yup.string().required('Contact is required'),
-  from: Yup.string().required('From location is required'),
-  to: Yup.string().required('To location is required'),
-  distance: Yup.number().required('Distance is required'),
-  quotePrice: Yup.number().required('Quote Price is required'),
-  date: Yup.date().required('Date is required'),
-  productDetails: Yup.mixed(), // Adjust based on your requirements
-  vehicleType: Yup.string().required('Vehicle Type is required'),
-  driver: Yup.string().required('Driver selection is required'),
-  status: Yup.string().required('Status is required'),
+  // name: Yup.string().required('Name is required'),
+  // contact: Yup.string().required('Contact is required'),
+  // from: Yup.string().required('From location is required'),
+  // to: Yup.string().required('To location is required'),
+  // distance: Yup.number().required('Distance is required'),
+  // quotePrice: Yup.number().required('Quote Price is required'),
+  // date: Yup.date().required('Date is required'),
+  // productDetails: Yup.mixed(), // Adjust based on your requirements
+  // vehicleType: Yup.string().required('Vehicle Type is required'),
+  // driver: Yup.string().required('Driver selection is required'),
+  // status: Yup.string().required('Status is required'),
 });
 
 
@@ -129,10 +130,17 @@ const kendoColumns = [
     filterable: { multi: true }
   },
   {
-    title: "Status",
-    field: "paymentStatus",
+    title: "Job Status",
+    field: "job_id.status",
     width: "120px",
-    template: "#= paymentStatus || '' #",
+    template: "#= typeof job_id !== 'undefined' ? job_id?.status ??'request pending' : 'request pending' #",
+    filterable: { multi: true }
+  },
+  {
+    title: "Payment Status",
+    field: "paymentStatus",
+    width: "140px",
+    template: "#= paymentStatus #",
     filterable: { multi: true }
   },
   {
@@ -256,7 +264,7 @@ const columns = useMemo(() => [
     try {
       mutation.mutate({
         method: "delete",
-        url: `${quotationapi}/${deleteId}`,
+        url: `${financeapi}/${deleteId}`,
         key:'quotation',
       });
     } catch (error) {
@@ -266,7 +274,13 @@ const columns = useMemo(() => [
         // console.log("values...............................",values)
         // return 
         try {
-          const apiurl = values?._id? `${quotationapi}/${values._id}` : quotationapi;
+          const apiurl = values?._id? `${financeapi}/${values._id}` : financeapi;
+          if(values.pendingAmount===0){
+            values.paymentStatus ="fully paid"
+          }
+          if(values.advanceAmount && values.pendingAmount!=0){
+            values.paymentStatus ="advance paid"
+          }
           mutation.mutate({
               method: values?._id? "put":"post",
               url: apiurl,
@@ -288,7 +302,6 @@ const columns = useMemo(() => [
         }
        
       };
-    console.log("sleecteddata",selectData)
   return (
     <>
     {
@@ -364,7 +377,7 @@ const columns = useMemo(() => [
           jobstatus: selectData?.job_id?.status || "",
           paymentStatus: selectData?.paymentStatus || "",
           advanceAmount: selectData?.advanceAmount || "",
-          pendingAmount: selectData?.pendingAmount || "",
+          pendingAmount: selectData?.pendingAmount || selectData?.advanceAmount ? (selectData?.quotationId?.quotePrice-selectData?.advanceAmount) :selectData?.quotationId?.quotePrice ,
           ...(selectData?._id ? { _id: selectData._id } : {}),
         }}
         validationSchema={validationSchema}
@@ -510,14 +523,15 @@ const columns = useMemo(() => [
                 
           
                 <SingleSelect
-                    name="status"
-                    label="status"
-                    placeholder="Select status"
+                    name="jobstatus"
+                    label="Job Status"
+                    placeholder="Select job status"
+                    disabled
                     className="w-100"
                     options={[
-                      {value:"request-pending",label:"Request pending"},
-                      {value:"driver-arrived",label:"Driver Arrived"},
-                      {value:"picked-up",label:"Picked up"},
+                      {value:"request pending",label:"Request pending"},
+                      {value:"driver arrived",label:"Driver Arrived"},
+                      {value:"picked up",label:"Picked up"},
                       {value:"delivered",label:"Delivered"},
                     ] || []}
                     onChange={(value) => {
@@ -526,9 +540,10 @@ const columns = useMemo(() => [
                     colWidth={6}
                     variant="border"
                   />
-                 
+                 <FormikField name="advanceAmount" label="advanceAmount" placeholder="Advance amount" onChange={(value)=>setFieldValue("pendingAmount",values?.quotePrice - value) && setFieldValue("advanceAmount",value)} type = 'number' colWidth={6} />
+                 <FormikField name="pendingAmount" label="pendingAmount" placeholder="Pending amount" type = 'number' colWidth={6} />
                 <Col md={6}>
-                {/* <FormikField name="productDetails" label="Product Details" type = 'file' colWidth={12} /> */}
+                
                 <label>Product details</label>
             {values?.productDetails.length ? (
   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}> 

@@ -24,19 +24,25 @@ import ConfirmationDialog from '../../../components/modal/ConfirmationDialog.jsx
 
 export default function Quotation() {
   const [pageLoading, setpageLoading] = useState(true);
-  const { mobileSide,optionPlaces } = useContext(ContextDatas);
+  const { mobileSide,optionPlaces,search } = useContext(ContextDatas);
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [selectData,setselectData] =useState('')
   const [isloading,setisloading]= useState(false)
-  const [pagination,setPagination] =useState({
-    pageIndex:0,
-    pageSize:10
-  })
+  const [params,setparams] = useState({
+      page:1,
+      limit:10
+    })
+    useEffect(() => {
+      setparams((prev) => ({
+        ...prev,
+        query: search,
+      }));
+    }, [search])
   const [confirmationState,setConfirmationState]=useState(false)
   const {mutation} = useCustomMutation();
-  const { data: quotdatalist} = useFetchData('quotation',fetchQuatation);
+  const { data: quotdatalist} = useFetchData('quotation',fetchQuatation,params);
   const {data:trucklist} = useFetchData("truckS",fetchTrucks)
   const optiontrucks = trucklist?.data?.docs?.map(item=>({
     value:item._id,
@@ -393,7 +399,14 @@ export default function Quotation() {
                           role="tabpanel"
                           aria-labelledby="t_selling-today222-tab"
                         >
-                          <Table data={quotdatalist?.data?.docs??[]} columns={columns} pagination={pagination} 
+                          <Table data={quotdatalist?.data?.docs??[]} columns={columns} setParams={setparams}
+                           pagination={{
+                            page: params.page,
+                            limit: params.limit,
+                            totalPages: quotdatalist?.data?.totalDocs,
+                            hasNext: quotdatalist?.data?.hasNextPage,
+                            hasPrevious: quotdatalist?.data?.hasPreviousPage,
+                          }}
                           // setPagination={setPagination}
                           />
                           

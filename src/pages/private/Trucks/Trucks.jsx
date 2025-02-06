@@ -21,12 +21,18 @@ import { useCustomMutation } from '../../../services/useCustomMutation';
 import { Pencil, Trash2 } from 'lucide-react';
 export default function Trucks() {
     const [pageLoading, setpageLoading] = useState(true);
-  const { mobileSide,optionPlaces } = useContext(ContextDatas);
+  const { mobileSide,optionPlaces ,search} = useContext(ContextDatas);
   const {mutation} = useCustomMutation(); 
   const [params,setparams] = useState({
-    page:"",
-    limit:""
+    page:1,
+    limit:10
   })
+  useEffect(() => {
+    setparams((prev) => ({
+      ...prev,
+      query: search,
+    }));
+  }, [search])
   const [show, setShow] = useState(false);
  const [selectData,setselectData] =useState('')
   const handleClose = () => setShow(false);
@@ -41,10 +47,7 @@ const {data:trucklist} = useFetchData("truckS",fetchTrucks,params)
     label:item.name,
   }))
 const [confirmationState,setConfirmationState]=useState(false)
-const [pagination,setPagination] =useState({
-  pageIndex:0,
-  pageSize:10
-})
+
   // useEffect(() => {
   //   const timer = setTimeout(() => {
   //     setpageLoading(false);
@@ -114,9 +117,9 @@ const [pagination,setPagination] =useState({
        
       // </ul>
       cell: ({ row }) => (
-        <ul className='text-align-center d-flex'>
-          <li>
-            <a href="#" className="view m-3"onClick={() => {
+        <ul className='text-align-center '>
+          <li className="d-flex gap-3">
+            <a href="#" className="view"onClick={() => {
                 handleShow(); 
                 setselectData(row.original);
               }} >
@@ -214,7 +217,14 @@ const [pagination,setPagination] =useState({
                           role="tabpanel"
                           aria-labelledby="t_selling-today222-tab"
                         >
-                          <Table data={trucklist?.data?.docs??[]} columns={columns} pagination={pagination} 
+                          <Table data={trucklist?.data?.docs??[]} columns={columns} setParams={setparams}
+                           pagination={{
+                            page: params.page,
+                            limit: params.limit,
+                            totalPages: trucklist?.data?.totalDocs,
+                            hasNext: trucklist?.data?.hasNextPage,
+                            hasPrevious: trucklist?.data?.hasPreviousPage,
+                          }}
                           // setPagination={setPagination}
                           />
                           

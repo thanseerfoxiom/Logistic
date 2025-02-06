@@ -4,7 +4,7 @@ import { useField, useFormikContext } from 'formik';
 import { BaseUrl, uploadapi } from '../services/BaseUrls';
 import { FileUp } from 'lucide-react';
 import { useCustomMutation } from '../services/useCustomMutation';
-const FormikField = ({ label, name, type, placeholder, xs = 12, colWidth = 12, disabled = false, uploadUrl,imagetype = "string" }) => {
+const FormikField = ({ label, name, type, placeholder, xs = 12, colWidth = 12, disabled = false,onChange, uploadUrl,imagetype = "string" }) => {
   const [field, meta] = useField(name); // Hooks into Formik's context
   const { setFieldValue ,values} = useFormikContext();
   const {mutation} = useCustomMutation();
@@ -68,7 +68,21 @@ const FormikField = ({ label, name, type, placeholder, xs = 12, colWidth = 12, d
       }
     }
   };
+  const firstTrim = (value) => {
+    return value.replace(/^\s+/, "");
+  };
 
+  const handleChange = (e) => {
+    console.log(";;;;;;;;;;;;;;;;;;;;;;;;;;;",e.target.value)
+    const trimmedValue = firstTrim(e.target.value);
+    if (onChange) {
+      onChange(trimmedValue);
+    } else {
+      field.onChange({
+        target: { name: e.target.name, value: trimmedValue },
+      });
+    }
+  };
   return (
     <Col xs={xs} md={colWidth}>
       <Form.Group className="mb-3" controlId={`form${name}`}>
@@ -115,6 +129,7 @@ const FormikField = ({ label, name, type, placeholder, xs = 12, colWidth = 12, d
             placeholder={placeholder}
             {...field} // Spread Formik's field props
             disabled={disabled}
+            onChange={handleChange}
           />
           {type==="password"?
           <div

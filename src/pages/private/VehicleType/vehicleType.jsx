@@ -23,18 +23,24 @@ import { Eye, Pencil, Trash2 } from 'lucide-react';
 
 export default function VehicleType() {
     const [pageLoading, setpageLoading] = useState(true);
-  const { mobileSide,optionPlaces } = useContext(ContextDatas);
+  const { mobileSide,optionPlaces ,search} = useContext(ContextDatas);
   const {mutation} = useCustomMutation(); 
   const [params,setparams] = useState({
-    page:"",
-    limit:""
+    page:1,
+    limit:10
   })
+  useEffect(() => {
+    setparams((prev) => ({
+      ...prev,
+      query: search,
+    }));
+  }, [search])
   const [show, setShow] = useState(false);
- const [selectData,setselectData] =useState('')
+  const [selectData,setselectData] =useState('')
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [deleteId,setDeleteId]=useState(null)
-const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle);
+  const { data: vehiclelist} = useFetchData('vehicletype',fetchvehicle,params);
 
 
   // Holds data for the currently selected driver (for editing)
@@ -64,7 +70,6 @@ const [pagination,setPagination] =useState({
         accessorKey: 'name',
         cell:info=><strong >{info.getValue()}</strong>
       },
-     
       {
         header: 'Action',
         size:120,
@@ -78,10 +83,10 @@ const [pagination,setPagination] =useState({
        
       // </ul>
       cell: ({ row }) => (
-        <ul className='text-align-center d-flex'>
+        <ul className='text-align-center '>
           
-          <li>
-            <a href="#" className="view m-3"onClick={() => {
+          <li className="d-flex gap-3">
+            <a href="#" className="view "onClick={() => {
                 handleShow(); 
                 setselectData(row.original);
               }} >
@@ -180,7 +185,14 @@ const [pagination,setPagination] =useState({
                           role="tabpanel"
                           aria-labelledby="t_selling-today222-tab"
                         >
-                          <Table data={vehiclelist?.data?.docs??[]} columns={columns} pagination={pagination} 
+                          <Table data={vehiclelist?.data?.docs??[]} columns={columns} setParams={setparams}
+                           pagination={{
+                            page: params.page,
+                            limit: params.limit,
+                            totalPages: vehiclelist?.data?.totalDocs,
+                            hasNext: vehiclelist?.data?.hasNextPage,
+                            hasPrevious: vehiclelist?.data?.hasPreviousPage,
+                          }}
                           // setPagination={setPagination}
                           />
                           

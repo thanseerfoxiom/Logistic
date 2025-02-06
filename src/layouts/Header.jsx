@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { ContextDatas } from "../services/Context";
 
 function Header() {
-  const { mobileSide, setmobileSide , setuser} = useContext(ContextDatas);
+  const { mobileSide, setmobileSide , setuser,setsearch ,search} = useContext(ContextDatas);
   const signOutHandler=()=>{
     localStorage.removeItem("token")
     setuser("")
@@ -12,11 +12,10 @@ function Header() {
       <nav className="navbar navbar-light">
         <div className="navbar-left">
           <div className="logo-area">
-            <a className="navbar-brand mt-4" href="/">
+          <h6>Xtrace</h6>
+            {/* <a className="navbar-brand mt-4" href="/">
               <img className="dark" src="/img/logo/logo1-01.png" alt="logo" />
-            {/* <img className="light" src="/img/logo-white.png" alt="logo" /> */}
-              {/* <span>Clarita</span> */}
-            </a>
+            </a> */}
             <a
               // href="#"
               className="sidebar-toggle"
@@ -50,6 +49,8 @@ function Header() {
                   type="search"
                   placeholder="Search..."
                   aria-label="Search"
+                  value={search}
+                  onChange={(e)=>setsearch(e.target.value)}
                 />
               </form>
             </li>
@@ -90,18 +91,17 @@ function Header() {
                           <a href>
                             <i className="uil uil-user" /> Profile
                           </a>
-                        </li>
-                        <li>
-                          <a href>
-                            <i className="uil uil-setting" />
-                            Settings
-                          </a>
                         </li> */}
-                       
-                      </ul>
-                      <a href onClick={()=>signOutHandler()} className="nav-author__signout cursor-true">
+                        <li>
+                        <a href onClick={()=>signOutHandler()} className=" cursor-true ">
                         <i className="uil uil-sign-out-alt" /> Sign Out
                       </a>
+                        </li>
+                       
+                      </ul>
+                      {/* <a href onClick={()=>signOutHandler()} className="nav-author__signout cursor-true ">
+                        <i className="uil uil-sign-out-alt" /> Sign Out
+                      </a> */}
                     </div>
                   </div>
                 </div>

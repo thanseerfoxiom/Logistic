@@ -7,104 +7,86 @@ import {
 } from '@tanstack/react-table';
 import Pagination from './Pagination';
 
-export default function Table({ data, columns, pagination, setPagination }) {
+export default function Table({ data, columns, pagination, setParams }) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: { pagination },
-    onPaginationChange: setPagination,
-    pageCount: Math.ceil(data?.length / pagination.pageSize),
+    manualPagination: true,
+    pageCount: pagination?.totalPages??1,
+    state: {
+      pagination: {
+        pageIndex: pagination?.page??1,
+        pageSize: pagination?.limit??10
+      }
+    },
+    // onPaginationChange: (updater) => {
+    //   setparams(prev => ({
+    //     ...prev,
+    //     ...updater(),
+    //   }));
+    // },
   });
 
-  return (
-    <>
-      <div className="userDatatable mt-1 p-2 table-responsive">
-        {/* 1) Set table-layout: fixed and width: 100% */}
-        <table
-          className="table table--default body-px-25"
-          style={{
-            tableLayout: 'fixed', // Ensures columns use the width you set
-            width: '100%',
-          }}
-        >
-          <thead className=' text-uppercase'>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} >
-                {headerGroup.headers.map((header) => {
-                  // Use a 'size' property on the column, or default to auto
-                  // console.log("header.column.columnDef.size",header.column.columnDef.size)
-                  const columnSize = header.column.columnDef.size || 'auto';
-                  // console.log(";;;;;;;;;;;;;",columnSize)
+  return (<>
+    <div className=" mt-1 p-2 table-responsive">
+    <table className="table table--default body-px-25">
+                            
+                              <thead>
+                                {table?.getHeaderGroups()?.map(headerGroup => (
+                                  <tr key={headerGroup?.id}>
+                                    {headerGroup?.headers?.map(header => (
+                                     <th 
+                                     key={header?.id} 
+                                     className="pt-6 pb-[27px] px-[22px] bg-tableheader border border-inputborder text-left text-buttontextcolor whitespace-nowrap">
+                                     <h5>{header ? flexRender(header?.column?.columnDef?.header, header?.getContext()) : null}</h5>
+                                   </th>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </thead>
+                              <tbody>
+                              {table.getRowModel().rows.length > 0 ? (
+            table.getRowModel().rows.map((row) => (
+              <tr key={row.id} className='hover:bg-gray-100'>
+                {row.getVisibleCells().map((cell,index) => {
+                  const columnSize = cell.column.columnDef.size || 'auto';
+                  const isTruncated = cell.column.columnDef.isTruncated || false;
                   return (
-                    <th
-                      key={header.id}
+                    <td
+                      key={cell?.id}
+                      className={`px-[20px] pt-[23px] pb-[24px] border-b truncate  text-sm font-medium  ${
+                        index === row?.getVisibleCells()?.length - 1 ? '' : 'border-r'
+                      } ${isTruncated ? 'truncate' : ''}`}
+
                       style={{
-                        // textAlign: 'center',
-                        width: `${columnSize}px`, // Must set <th> width for fixed layout
-                        backgroundColor:"#848c93",
-                        color:"white",
-                        borderStyle: "solid",
-                        borderWidth: "0 0 1px 1px",
-                     
+                        width: columnSize !== 'auto' ? `${columnSize}px` : 'auto',
+                        maxWidth: columnSize !== 'auto' ? `${columnSize}px` : 'none',
                       }}
-                      className=" text-uppercase"
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                    </th>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
                   );
                 })}
               </tr>
-            ))}
-          </thead>
-          <tbody>
-            {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => {
-                    const columnSize = cell.column.columnDef.size || 'auto';
-                    const isTruncated =
-                      cell.column.columnDef.isTruncated || false;
-                    const alignment = cell.column.columnDef.align || 'left';
-
-                    let alignmentClass = 'text-left';
-                    if (alignment === 'center') alignmentClass = 'text-center';
-                    else if (alignment === 'right') alignmentClass = 'text-right';
-
-                    return (
-                      <td
-                        key={cell.id}
-                        className={`px-4 py-2 border border-gray-200 text-gray-700 text-sm ${
-                          isTruncated ? 'truncate' : ''
-                        } ${alignmentClass}`}
-                        style={{
-                          width: `${columnSize}px`,
-                          whiteSpace: 'normal', // allows multi-line wrap
-                          wordBreak: 'break-word', // or "break-all"
-                          overflowWrap: 'anywhere',
-                        }}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={columns.length} className="py-3 text-center text-gray-500">
-                  No Data
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <Pagination table={table} />
-    </>
-  );
+            ))
+          ) : (
+            <tr>
+              <td colSpan={columns?.length} className="py-3 text-center text-gray-500">
+                No Data
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+                        </div>
+                        {pagination?
+                        <Pagination 
+        pagination={pagination} 
+        setPagination={setParams} 
+      />
+      :""}
+                           
+                            </>
+  )
 }

@@ -1,8 +1,8 @@
 import { ApiCall } from "../services/ApiCall"
 import { financeapi, jobapi, quotationapi, truckapi, usersapi, vehicleTypeapi } from "../services/BaseUrls"
 
-export const fetchQuatation = async(page,limit)=> {
-    const response = await ApiCall("GET",quotationapi,null,{page,limit});
+export const fetchQuatation = async(params)=> {
+    const response = await ApiCall("GET",quotationapi,null,params);
     if(response?.status){
         return response.message
          }
@@ -10,8 +10,8 @@ export const fetchQuatation = async(page,limit)=> {
         return []
          }
 }
-export const fetchjob = async(page,limit)=> {
-    const response = await ApiCall("GET",jobapi,null,{page,limit});
+export const fetchjob = async(params)=> {
+    const response = await ApiCall("GET",jobapi,null,params);
     if(response?.status){
         return response.message
          }
@@ -19,8 +19,8 @@ export const fetchjob = async(page,limit)=> {
         return []
          }
 }
-export const fetchvehicle = async(page,limit)=> {
-    const response = await ApiCall("GET",vehicleTypeapi,null,{page,limit});
+export const fetchvehicle = async(params)=> {
+    const response = await ApiCall("GET",vehicleTypeapi,null,params);
     if(response?.status){
         return response.message
          }
@@ -28,8 +28,9 @@ export const fetchvehicle = async(page,limit)=> {
         return []
          }
 }
-export const fetchDriver = async(page,limit)=> {
-    const response = await ApiCall("GET",usersapi,null,{page,limit,role:"driver"});
+export const fetchDriver = async(params)=> {
+    params.role = "driver"
+    const response = await ApiCall("GET",usersapi,null,params);
     if(response?.status){
         return response.message
          }

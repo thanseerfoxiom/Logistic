@@ -54,7 +54,24 @@ export default function KendoTable({
     }),
   ];
 
-
+  function replaceNullsWithEmptyStrings(obj) {
+    if (obj === null || obj === undefined) {
+      return "";
+    }
+    if (Array.isArray(obj)) {
+      return obj.map((item) => replaceNullsWithEmptyStrings(item));
+    }
+    if (typeof obj === "object") {
+      const newObj = {};
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          newObj[key] = replaceNullsWithEmptyStrings(obj[key]);
+        }
+      }
+      return newObj;
+    }
+    return obj;
+  }
 
   // Initialize the Kendo Grid
   useEffect(() => {
@@ -67,12 +84,18 @@ export default function KendoTable({
     }
 
     const finalDataSourceConfig = {
+      schema: {
+        parse: function (response) {
+          // If `response` is an array of data items:
+          return response.map((item) => replaceNullsWithEmptyStrings(item));
+        },
+      },
       pageSize: 20,
       autoSync: true,
       data: dataSourceConfig.data || datas,
       ...dataSourceConfig,
     };
-
+    
     const dataBound = function(e) {
       const grid = this;
       grid.table.find("tr").each(function() {
@@ -140,7 +163,7 @@ export default function KendoTable({
         ...gridProps,
       });
     }
-  }, [dataSourceConfig, columns, gridProps, datas, selectable, enableGroupable, enableFilterable, enableToolbar]);
+  }, [ enableGroupable, enableFilterable, enableToolbar]);
   useEffect(() => {
     const grid = gridRef.current;
     if (grid && datas) {
