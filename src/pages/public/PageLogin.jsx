@@ -91,7 +91,9 @@ function PageLogin() {
                             values,
                             errors,
                             touched,
-                          }) => (
+                          }) => {
+                            console.log("basfiasd",values)
+                            return (
                             <Form onSubmit={handleSubmit}>
                               <Row>
                                 <FormikField
@@ -100,7 +102,7 @@ function PageLogin() {
                                   placeholder="name@example.com"
                                   type="text"
                                   colWidth={12}
-                                  onChange={handleChange}
+                                  // onChange={handleChange}
                                   onBlur={handleBlur}
                                   value={values.email}
                                   isInvalid={touched.email && errors.email}
@@ -148,7 +150,7 @@ function PageLogin() {
                                 </div>
                               </Row>
                             </Form>
-                          )}
+                          )}}
                         </Formik>
                       </div>
                     </div>

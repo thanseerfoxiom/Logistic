@@ -29,6 +29,7 @@ export default function Quotation() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [selectData,setselectData] =useState('')
+  const [deleteId,setDeleteId]=useState(null)
   const [isloading,setisloading]= useState(false)
   const [params,setparams] = useState({
       page:1,
@@ -63,6 +64,10 @@ export default function Quotation() {
   //   lat:item.latitude,
   //   lon:item.longitude
   // }))
+  const handleDeleteConfirmation = (deleteId) => {
+    setConfirmationState(true);
+    setDeleteId(deleteId);
+  };
   const handleDelete=()=>{
     try {
       mutation.mutate({
@@ -339,7 +344,7 @@ export default function Quotation() {
     // </ul>
     cell: ({ row }) => (
       <ul className='text-align-center d-flex'>
-        <li>
+        <li className='d-flex gap-3'>
           <a
             href="#"
             className="view"
@@ -350,6 +355,9 @@ export default function Quotation() {
           >
             <i className="uil uil-eye action_fonts"></i>
           </a>
+          <a href="#" className="view" onClick={()=>handleDeleteConfirmation(row?.original?._id)}>
+                          <Trash2 className="wh-20 flex-shrink-0 cursor-pointer" />
+                        </a>
         </li>
       </ul>
     )
@@ -611,7 +619,7 @@ export default function Quotation() {
         open={confirmationState}
         onOpenChange={setConfirmationState}
         title="Confirm Deletion"
-        message="Are you sure you want to delete this product ?"
+        message="Are you sure you want to delete this Quotation ?"
         onConfirm={handleDelete}
         onCancel={setConfirmationState}
       />
